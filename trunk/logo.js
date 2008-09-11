@@ -37,14 +37,14 @@ function parse(text) {
         norm['lt'] = 'left';
 
     var ops = new Array();
-        ops['forward'] = new Operator('forward','prefix',0,1);
-        ops['backward'] = new Operator('backward','prefix',0,1);
-        ops['right'] = new Operator('right','prefix',0,1);
-        ops['left'] = new Operator('left','prefix',0,1);
+        ops['forward'] = new Operator('forward','cmd',0,1);
+        ops['backward'] = new Operator('backward','cmd',0,1);
+        ops['right'] = new Operator('right','cmd',0,1);
+        ops['left'] = new Operator('left','cmd',0,1);
 
-        ops['penup'] = new Operator('penup','nofix',0,0);
-        ops['pendown'] = new Operator('pendown','nofix',0,0);
-        ops['clear'] = new Operator('clear','nofix',0,0);
+        ops['penup'] = new Operator('penup','cmd',0,0);
+        ops['pendown'] = new Operator('pendown','cmd',0,0);
+        ops['clear'] = new Operator('clear','cmd',0,0);
 
     var ops_stack = new Array():
     var items_stack = new Array();
@@ -61,7 +61,7 @@ function parse(text) {
                 token[1] = norm[token[1]]
             }
         }
-
+        
         // unwind stack
 
         if(token[0] == 'id') {
@@ -76,7 +76,6 @@ function parse(text) {
         } else { // it is an item
             items_stack.push(token)
         }
-        alert(token);
     } while(true);
 }
 
