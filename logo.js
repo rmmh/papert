@@ -12,7 +12,15 @@ function logo_to_js_list(code, checkend) {
     var js = new Array();
    
     var p = parse(code); 
+    
     return  js;
+}
+
+function Operator(id,type,binding,grab) {
+    this.id = id;
+    this.type=type;
+    this.binding=binding;
+    this.grab=grab;
 }
 
 function parse(text) {
@@ -28,6 +36,20 @@ function parse(text) {
         norm['rt'] = 'right';
         norm['lt'] = 'left';
 
+    var ops = new Array();
+        ops['forward'] = new Operator('forward','prefix',0,1);
+        ops['backward'] = new Operator('backward','prefix',0,1);
+        ops['right'] = new Operator('right','prefix',0,1);
+        ops['left'] = new Operator('left','prefix',0,1);
+
+        ops['penup'] = new Operator('penup','nofix',0,0);
+        ops['pendown'] = new Operator('pendown','nofix',0,0);
+        ops['clear'] = new Operator('clear','nofix',0,0);
+
+    var ops_stack = new Array():
+    var items_stack = new Array();
+
+
     do {
         token = tk.next()
         if (token == null)  break;
@@ -38,6 +60,21 @@ function parse(text) {
             if (norm[token[1]] != null) {
                 token[1] = norm[token[1]]
             }
+        }
+
+        // unwind stack
+
+        if(token[0] == 'id') {
+            var op = ops[token[1]];
+            if (op != null) {
+                ops_stack.push(op);
+            } else {
+                return alert("Unexpected command: "+token[1]);
+            }
+        } else if (token[0] == 'eof') {
+            break;
+        } else { // it is an item
+            items_stack.push(token)
         }
         alert(token);
     } while(true);
@@ -57,7 +94,7 @@ function Tokenizer(text) {
 
         if (this.empty.exec(this.text)) {
             this.text = null;
-            return null;
+            return ['eof',''];
 
         } else if ((result = this.id_rx.exec(this.text)) != null) {
             this.text = this.text.substring(result[0].length)
@@ -69,7 +106,7 @@ function Tokenizer(text) {
 
         } else if ((result = this.num_rx.exec(this.text)) != null) {
             this.text = this.text.substring(result[0].length)
-            return ['num',result[1]];
+            return ['num',parseFloat(result[1])];
 
         } else if ((result = this.str_rx.exec(this.text)) != null) {
             this.text = this.text.substring(result[0].length)
