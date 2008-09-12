@@ -35,6 +35,8 @@ function Logo (turtle) {
         //alert("evaling "+code);
         if (code == null) {
             return null;
+        } else if (code.type == "def") {
+            this.symbols[code.data] =  code.args
         } else if (code.type == "lst") {
             //alert('evaling list');
             this.eval_list(code.args);
@@ -53,6 +55,7 @@ function Logo (turtle) {
                 }
             } else if (this.symbols[code.data] != null) {
                 // it's been defined.
+                this.eval_list(this.symbols[code.data]);
             } else {
                 // it's a builtin
                 var f = this.turtle[code.data]
@@ -108,7 +111,37 @@ function Parser(tk) {
         }
         
         if (token.type == "wrd") {
-            if (token.data == '[') {
+            if (token.data == "to") {
+                var args = new Array();
+                do {
+                    var i = this.next();
+                    
+                    if (i == null) return new Token('error','null token received');
+                    if (i.type == "error") return i;
+                    if (i.type == "eof") return new Token('error','premature eof');
+                 
+                    if (i.type == "wrd" && i.data == 'end') break;
+                    
+                    args.push(i);
+                } while (1);
+                //alert("end of list");
+                
+                var name = args.shift()
+                
+                if (name.type == "wrd") {
+                    name = name.data;
+                } else {
+                    return new Token('error','expected word, got something else');
+                }
+                
+                token.type = "def";
+                token.data = name;
+                
+                token.args = args;
+                alert(token);
+            
+            } else if (token.data == '[') {
+            
                 var args = new Array();
                 do {
                     var i = this.next();
@@ -122,7 +155,9 @@ function Parser(tk) {
                     args.push(i);
                 } while (1);
                 //alert("end of list");
+                
                 token.type = "lst";
+                token.data
                 token.args = args;
                 //alert(token);
             
@@ -145,6 +180,7 @@ function Parser(tk) {
                  }
             }
         }
+        
         
         //alert("returning token "+ token)
         return token;
