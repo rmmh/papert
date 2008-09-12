@@ -60,13 +60,24 @@ Is broken
 <div id="oldcode">&nbsp;</div>
 <div>
 <textarea id="code">
+to square
+repeat 4 [fw 100 right 90]
+end
+
+to thing
+repeat 10 [rt 60 square]
+end
+
+thing
 </textarea></div>
 <div>
 <input type="button" onClick="run();" value="run"/>
-<input type="reset" value="clear"/>
+<input type="reset" value="reset form"/>
 </div>
 </form>
 </div>
+
+Supported: forward n (fd), backward n (bd), right n (rt), left n (lt), penup (pu), pendown (pd), clear (cs), reset, repeat n [commands], to name commands end.
 
 </body>
 </html>
