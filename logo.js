@@ -1,29 +1,77 @@
-function eval_logo(code, turtle) {
+function Logo (turtle) {
+    this.turtle = turtle;
 
-    var js = new Array();
-   
-    var t = new Tokenizer(code)
-    var p = new Parser(t); 
+    this.symbols = new Array();
     
-    var i = null;
-    
-    do {
-        i = p.next();
-        if (p == null) return ['error','null parse tree received'];
-        if (p[0] == "error") return p;
-        if (p[0] == "eof") {
-            p = null;
-            break;
-        }
-           
+    this.run = function (code) {
+        var js = new Array();
+       
+        var t = new Tokenizer(code)
+        var p = new Parser(t); 
         
-        alert(i.type +":"+i.data+":"+i.args);
-    } while (1);
+        var i = null;
+        
+        do {
+            i = p.next();
+            if (p == null) return new Token('error','null parse tree received');
+            if (p.type == "error") return p;
+            if (p.type == "eof") {
+                p = null;
+                break;
+            }
+            
+            var out = this.eval(i);
+            if (out && out.type == "error") {return p;}
+            
+            
+        } while (1);
+        
+        return
+        }
     
-    return  js;
+    this.eval = function (code) {
+        //alert("evaling "+code);
+        if (code == null) {
+            return null;
+        } else if (code.type == "lst") {
+            //alert('evaling list');
+            this.eval_list(code.args);
+        } else if (code.type == "wrd") {
+            if (code.data == "repeat") {
+               // alert("repeat");
+                //alert(code.args[0].type);
+                if (code.args.length == 2 && code.args[0].type == "num") { 
+                    var limit = code.args[0].data;
+                    var cmd = code.args[1];
+                    for (var c = 0; c< limit; c++) {
+                        this.eval(cmd);
+                    }
+                } else {
+                    return new Token ('error','invalid args to repeat');
+                }
+            } else if (this.symbols[code.data] != null) {
+                // it's been defined.
+            } else {
+                // it's a builtin
+                var f = this.turtle[code.data]
+                var l = this.eval_list(code.args)
+                f.apply(this.turtle,l);
+            }
+        } else if (code.type == "num" || code.type == "sym") {
+            return code.data;
+        }
+    }
+    
+    this.eval_list = function(args) {
+        if (args == null) { return null;}
+        var ret = new Array()
+        for (var i = 0; i < args.length; i++) {
+            //alert(args[i]);
+            ret.push(this.eval(args[i]));
+        }
+        return ret;
+    }
 }
-
-
 function Parser(tk) {
     
     this.tk = tk
@@ -33,6 +81,7 @@ function Parser(tk) {
         grab['backward'] = 1;
         grab['right'] = 1;
         grab['left'] = 1;
+        
     
         grab['repeat'] = 2;
         
@@ -55,8 +104,7 @@ function Parser(tk) {
             this.tk = null;
             return token;
         }
-            
-        //alert(token[0]);
+        
         if (token.type == "wrd") {
             if (token.data == '[') {
                 var args = new Array();
@@ -71,7 +119,10 @@ function Parser(tk) {
                     
                     args.push(i);
                 } while (1);
+                //alert("end of list");
+                token.type = "lst";
                 token.args = args;
+                //alert(token);
             
             } else {
                  var g = this.grab[token.data];
@@ -86,6 +137,7 @@ function Parser(tk) {
                           
                         args.push(i);
                         g--;
+                        //alert(i.type+i.data);
                     }
                     token.args = args;
                  }
@@ -100,7 +152,10 @@ function Parser(tk) {
 function Token(type,data) {
     this.type = type;
     this.data = data;
-    this.args = null;
+    this.args = null; 
+    this.toString = function () {
+        return "(" + type + ")" + data ;
+    }
 }
 
 function Tokenizer(text) {

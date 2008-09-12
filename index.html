@@ -12,6 +12,9 @@ canvas { border:1px solid black;}
 <script src="logo.js"></script>
 <script>
 
+var turtle = null;
+var logo = null;
+
 function init (canvas_id,form_id,oldcode_id) {
     
     var canvas = document.getElementById(canvas_id);
@@ -26,13 +29,20 @@ function init (canvas_id,form_id,oldcode_id) {
     oldcode = document.getElementById(oldcode_id);
     oldcode.style.width = "90%";
     oldcode.style.height = "300px";
+    
+    turtle = new Turtle(canvas);
+    logo = new Logo(turtle);
 }
 function run () {
         var code = form.code.value;
-        var turtle = new Turtle(canvas);
+
         oldcode.innerHTML +="\n"+code
         //form.code.value = ""
-        eval_logo(code, turtle);
+        
+        var out = logo.run(code);
+        if (out.type == "error") {
+            alert(out.data);
+        }
 }
  
 
