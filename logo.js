@@ -138,7 +138,7 @@ function Parser(tk) {
                 token.data = name;
                 
                 token.args = args;
-                alert(token);
+                //alert(token);
             
             } else if (token.data == '[') {
             
