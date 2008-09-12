@@ -1,31 +1,112 @@
 function eval_logo(code, turtle) {
 
-    code = logo_to_js_list(code,0).join(";\n");
-
-    logo = eval(code);
-    
-    logo(turtle);
-    
-}
-
-function logo_to_js_list(code, checkend) {
     var js = new Array();
    
-    var p = parse(code); 
+    var t = new Tokenizer(code)
+    var p = new Parser(t); 
+    
+    var i = null;
+    
+    do {
+        i = p.next();
+        if (p == null) return ['error','null parse tree received'];
+        if (p[0] == "error") return p;
+        if (p[0] == "eof") {
+            p = null;
+            break;
+        }
+           
+        
+        alert(i.type +":"+i.data+":"+i.args);
+    } while (1);
     
     return  js;
 }
 
-function Operator(id,type,binding,grab) {
-    this.id = id;
-    this.type=type;
-    this.binding=binding;
-    this.grab=grab;
+
+function Parser(tk) {
+    
+    this.tk = tk
+
+    var grab = new Array();
+        grab['forward'] = 1;
+        grab['backward'] = 1;
+        grab['right'] = 1;
+        grab['left'] = 1;
+    
+        grab['repeat'] = 2;
+        
+    this.grab = grab;
+        
+    this.addCommand = function (wrd,n) {
+        this.grab['wrd'] = n;
+    }
+    
+    this.next = function () {
+        
+        var token = this.tk.next();
+        //alert("got token: "+token);
+        
+        if (token == null) return new Token('error','null token received');
+        
+        if (token.type == "error") return token;
+        
+        if (token.type == "eof") {
+            this.tk = null;
+            return token;
+        }
+            
+        //alert(token[0]);
+        if (token.type == "wrd") {
+            if (token.data == '[') {
+                var args = new Array();
+                do {
+                    var i = this.next();
+                    
+                    if (i == null) return new Token('error','null token received');
+                    if (i.type == "error") return i;
+                    if (i.type == "eof") return new Token('error','premature eof');
+                 
+                    if (i.type == "wrd" && i.data == ']') break;
+                    
+                    args.push(i);
+                } while (1);
+                token.args = args;
+            
+            } else {
+                 var g = this.grab[token.data];
+                 if (g != null) {
+                     var args = new Array();
+                     while (g > 0) {
+                        var i = this.next();
+                        
+                        if (i == null) return new Token('error','null token received');
+                        if (i.type == "error") return i;
+                        if (i.type == "eof") return new Token('error','premature eof');
+                          
+                        args.push(i);
+                        g--;
+                    }
+                    token.args = args;
+                 }
+            }
+        }
+        
+        //alert("returning token "+ token)
+        return token;
+    }
 }
 
-function parse(text) {
-    
-    var tk = new Tokenizer(text);
+function Token(type,data) {
+    this.type = type;
+    this.data = data;
+    this.args = null;
+}
+
+function Tokenizer(text) {
+
+    this.text = text;
+
 
     var norm = new Array();
         norm['pu'] = 'penup';
@@ -36,87 +117,41 @@ function parse(text) {
         norm['rt'] = 'right';
         norm['lt'] = 'left';
 
-    var ops = new Array();
-        ops['forward'] = new Operator('forward','cmd',0,1);
-        ops['backward'] = new Operator('backward','cmd',0,1);
-        ops['right'] = new Operator('right','cmd',0,1);
-        ops['left'] = new Operator('left','cmd',0,1);
-
-        ops['penup'] = new Operator('penup','cmd',0,0);
-        ops['pendown'] = new Operator('pendown','cmd',0,0);
-        ops['clear'] = new Operator('clear','cmd',0,0);
-
-    var ops_stack = new Array():
-    var items_stack = new Array();
-
-
-    do {
-        token = tk.next()
-        if (token == null)  break;
-        if (token[0] == 'error') {
-            alert("Error: unexpected text: "+token[1]);
-            return null;
-        } else if (token[0] == 'id') {
-            if (norm[token[1]] != null) {
-                token[1] = norm[token[1]]
-            }
-        }
-        
-        // unwind stack
-
-        if(token[0] == 'id') {
-            var op = ops[token[1]];
-            if (op != null) {
-                ops_stack.push(op);
-            } else {
-                return alert("Unexpected command: "+token[1]);
-            }
-        } else if (token[0] == 'eof') {
-            break;
-        } else { // it is an item
-            items_stack.push(token)
-        }
-    } while(true);
-}
-
-function Tokenizer(text) {
-
-    this.text = text;
-
-    this.id_rx = /^\s*([a-zA-Z]\w*)\s*/i;
-    this.var_rx = /^\s*(:[a-zA-Z]\w*)\s*/i;
+    this.norm = norm;
+    
+    this.wrd_rx = /^\s*([a-zA-Z]\w*|\[|\])\s*/i;
+    this.var_rx = /^\s*:([a-zA-Z]\w*)\s*/i;
     this.num_rx = /^\s*(\d+(?:\.\d+)?)\s*/i;
-    this.str_rx = /^\s*"((?:(?!\\)[^"]|\\")*)"\s*/i;
+    this.sym_rx = /^\s*"([a-zA-Z]\w*)\s*/i;
 
     this.empty = /^\s*$/;
     this.next = function () {
 
         if (this.empty.exec(this.text)) {
             this.text = null;
-            return ['eof',''];
+            return new Token('eof','');
 
-        } else if ((result = this.id_rx.exec(this.text)) != null) {
+        } else if ((result = this.wrd_rx.exec(this.text)) != null) {
             this.text = this.text.substring(result[0].length)
-            return ['id',result[1]];
+            if (this.norm[result[1]] != null) {
+                result[1] = this.norm[result[1]]
+            }
+            return new Token('wrd',result[1]);
 
         } else if ((result = this.var_rx.exec(this.text)) != null) {
             this.text = this.text.substring(result[0].length)
-            return ['var',result[1]];
+            return new Token('var',result[1]);
 
         } else if ((result = this.num_rx.exec(this.text)) != null) {
             this.text = this.text.substring(result[0].length)
-            return ['num',parseFloat(result[1])];
+            return new Token('num',parseFloat(result[1]));
 
-        } else if ((result = this.str_rx.exec(this.text)) != null) {
+        } else if ((result = this.sym_rx.exec(this.text)) != null) {
             this.text = this.text.substring(result[0].length)
-            return ['str',result[1]];
+            return new Token('sym',result[1]);
 
-       /* } else if ((result = this.regex.exec(this.text)) != null) {
-            this.text = this.text.substring(result[0].length)
-            return ['id',result[1]];
-       */
         } else {
-            return ['error', this.text];
+            return new Token('error', this.text);
         }
     }   
 }
