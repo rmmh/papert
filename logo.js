@@ -21,6 +21,13 @@ function Logo (turtle) {
 
     this.builtins = builtins;
 
+    var arithmetic = new Array();
+        arithmetic['add'] = function (x,y) {return x+y};
+        arithmetic['sub'] = function (x,y) {return x-y};
+        arithmetic['mul'] = function (x,y) {return x*y};
+        arithmetic['div'] = function (x,y) {return x/y};
+
+    this.arithmetic = arithmetic;
 
     this.run = function (code) {
         var js = new Array();
@@ -85,6 +92,15 @@ function Logo (turtle) {
                 } else {
                     return new Token('error','I can\'t make');
                 }
+            } else if (this.arithmetic[code.data]) {
+                //alert("arith");
+                var x = this.eval(code.args[0]);
+                var y = this.eval(code.args[1]);
+
+                var result = this.arithmetic[code.data](x,y);
+                //alert(""+x+" "+code.data+" "+y+" = "+result);
+                return result;
+            
             } else if (this.builtins[code.data]) {
 
                 // it's a builtin
@@ -173,6 +189,11 @@ function Parser () {
         grab['repeat'] = 2;
         grab['make'] = 2;
         
+        grab['add'] = 2;
+        grab['sub'] = 2;
+        grab['mul'] = 2;
+        grab['div'] = 2;
+
     this.grab = grab;
         
     this.addCommand = function (wrd,n) {
