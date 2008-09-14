@@ -60,15 +60,22 @@ Is broken
 <div id="oldcode">&nbsp;</div>
 <div>
 <textarea id="code">
-to square
-repeat 4 [fw 100 right 90]
+to polygon :sides :length
+repeat :sides [right div 360 :sides forward :length]
 end
 
-to thing
-repeat 10 [rt 60 square]
+to triangle :length
+polygon 3 :length
 end
 
-thing
+to heptangle :length
+polygon 7 :length
+end
+
+reset
+
+repeat 10 [triangle 100 rt 36 heptangle 88]
+
 </textarea></div>
 <div>
 <input type="button" onClick="run();" value="run"/>

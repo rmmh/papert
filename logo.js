@@ -18,6 +18,7 @@ function Logo (turtle) {
         builtins['pendown'] = true;
         builtins['clear'] = true;
         builtins['reset'] = true;
+        builtins['penwidth'] = true;
 
     this.builtins = builtins;
 
@@ -59,31 +60,41 @@ function Logo (turtle) {
         //alert("evaling "+code);
         if (code == null) {
             return null;
-        } else if (code.type == "def") {
+        } else if (code.type == "def") {        // a definition: to ....
             this.functions.set(code.data,code.args);
             //alert(code.args.args.length);
             this.p.addCommand(code.data,code.args.args.length);
-        } else if (code.type == "lst") {
+        } else if (code.type == "lst") {        // a list of items
             //alert('evaling list');
-            this.eval_list(code.args);
-        } else if (code.type == "wrd") {
-            if (code.data == "repeat") {
+            return this.eval_list(code.args);
+        } else if (code.type == "wrd") {        // a command
+            if (code.data == "repeat") {        // repeat n args
                // alert("repeat");
                 //alert(code.args[0].type);
                 if (code.args && code.args.length == 2) { 
                     var limit = this.eval(code.args[0]);
+                    if (limit == null) return new Token('error','Don\'t know how many times to repeat');
+                    if (limit && limit.type == "error") return limit;
+
                     var cmd = code.args[1];
                     for (var c = 0; c< limit; c++) {
-                        this.eval(cmd);
+                        var res = this.eval(cmd);
+                        if (res && res.type == "error") return res;
                     }
                 } else {
                     return new Token ('error','I can\'t repeat.');
                 }
-            } else if (code.data == "make") {
+            } else if (code.data == "make") {   // make "sym val
                 if (code.args && code.args.length == 2) {
                     if (code.args[0].type == "sym") {
                         var name = this.eval(code.args[0]);
+                        if (name == null) return new Token('error','Can\'t make with no name');
+                        if (name && name.type == "error") return name;
+
                         var value = this.eval(code.args[1]);
+                        if (value == null) return new Token('error','Can\'t set '+name+' to null');
+                        if (value && value.type == "error") return value;
+
                         //alert("make "+name+" "+value);
                         this.values.set(name,value);
                     } else {
@@ -92,56 +103,61 @@ function Logo (turtle) {
                 } else {
                     return new Token('error','I can\'t make');
                 }
-            } else if (this.arithmetic[code.data]) {
+            } else if (this.arithmetic[code.data]) {    // an arithmetic operation
                 //alert("arith");
                 var x = this.eval(code.args[0]);
+                if (x == null) return new Token('error','Can\'t give null to '+code.data);
+                if (x && x.type == "error") return x;
+
                 var y = this.eval(code.args[1]);
+                if (y == null) return new Token('error','Can\'t give null to '+code.data);
+                if (y && y.type == "error") return y;
 
                 var result = this.arithmetic[code.data](x,y);
                 //alert(""+x+" "+code.data+" "+y+" = "+result);
                 return result;
             
-            } else if (this.builtins[code.data]) {
+            } else if (this.builtins[code.data]) {  // a turtle command
 
                 // it's a builtin
                 var f = this.turtle[code.data]
                 var l = this.eval_list(code.args)
+                if (l && l.type == 'error') return l;
+
                 f.apply(this.turtle,l);
                 return null;
             
-            } else if (this.functions.get(code.data) != null) {
+            } else if (this.functions.get(code.data) != null) { // a user defined function
 
                 var f = this.functions.get(code.data);
 
-                if (code.args && code.args.length > 0) {
-                    var newvalues = new SymbolTable(this.values);
+                var newvalues = new SymbolTable(this.values);
 
-                    for (var c = 0; c < code.args.length; c ++ ) {
-                        var name = f.args[c].data;
-                        var value = this.eval(code.args[c]);
-                        //alert("setting: "+name +":" +value);
-                        newvalues.set(name,value);
+                for (var c = 0; c < code.args.length; c ++ ) {
+                    var name = f.args[c].data;
+                    var value = this.eval(code.args[c]);
+                    if (value == null) return new Token('error','Can\'t pass a null to '+code.data);
+                    if (value && value.type == 'error') return value;
 
-                    }
+                    //alert("setting: "+name +":" +value);
+                    newvalues.set(name,value);
 
-                    this.values = newvalues;
-                    var result = this.eval_list(f.code);
-
-                    this.values = this.values.par;
-                    return result
-
-                } else {
-                    return this.eval_list(f.code);
                 }
+
+                this.values = newvalues;
+                var result = this.eval_list(f.code);
+
+                this.values = this.values.par;
+                return result
 
             } else {
                 return new Token('error','I don\'t know how to ' + code.data);
             }
-        } else if (code.type == "var") {
+        } else if (code.type == "var") {        // a variable
             var r = this.values.get(code.data);
             //alert("getting:" + code.data + ":"+ r);
             return r
-        } else if (code.type == "num" || code.type == "sym") {
+        } else if (code.type == "num" || code.type == "sym") { // a number / symbol
             return code.data;
         }
     }
@@ -151,7 +167,12 @@ function Logo (turtle) {
         var ret = new Array()
         for (var i = 0; i < args.length; i++) {
             //alert(args[i]);
-            ret.push(this.eval(args[i]));
+            var res = this.eval(args[i]);
+            if (res && res.type == "error") {
+                return res;
+            } else {
+                ret.push(res);
+            }
         }
         return ret;
     }
@@ -185,6 +206,7 @@ function Parser () {
         grab['backward'] = 1;
         grab['right'] = 1;
         grab['left'] = 1;
+        grab['penwidth'] = 1;
         
         grab['repeat'] = 2;
         grab['make'] = 2;
@@ -193,6 +215,7 @@ function Parser () {
         grab['sub'] = 2;
         grab['mul'] = 2;
         grab['div'] = 2;
+
 
     this.grab = grab;
         
@@ -375,7 +398,7 @@ function Tokenizer () {
             return new Token('sym',result[1]);
 
         } else {
-            return new Token('error', this.text);
+            return new Token('error', 'I can\'t understand this:'+this.text);
         }
     }   
 }
