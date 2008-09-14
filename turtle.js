@@ -41,8 +41,9 @@ function Turtle (canvas) {
     this.penwidth = function(w) {
         this.c.lineWidth=w;
     }
-    this.colour = function(colour) {
-        this.c.strokeStyle = colour;
+
+    this.colour = function (r,g,b) {
+        this.c.strokeStyle = "rgb("+r+","+g+","+b+")";
     }
     
     this.color = this.colour;
@@ -123,7 +124,7 @@ function Turtle (canvas) {
         this.y = this.max_y/2;
         this.angle = 270;
         this.penwidth(1);
-        this.color("rgb(0,0,0)");
+        this.color(0,0,0);
         this.pen = true;
     }
 

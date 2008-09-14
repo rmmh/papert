@@ -10,17 +10,22 @@ function Logo (turtle) {
     this.p = new Parser();
 
     var builtins = new Array();
-        builtins['forward'] = true;
-        builtins['backward'] = true;
-        builtins['right'] = true;
-        builtins['left'] = true;
-        builtins['penup'] = true;
-        builtins['pendown'] = true;
-        builtins['clear'] = true;
-        builtins['reset'] = true;
-        builtins['penwidth'] = true;
+        builtins['forward'] = 1;
+        builtins['backward'] = 1;
+        builtins['right'] = 1;
+        builtins['left'] = 1;
+        builtins['penup'] = 0;
+        builtins['pendown'] = 0;
+        builtins['clear'] = 0;
+        builtins['reset'] = 0;
+        builtins['penwidth'] = 1;
+        builtins['color'] = 3;
+        builtins['colour'] = 3;
 
-    this.builtins = builtins;
+
+    for (var c in builtins) {
+        this.p.addCommand(c,builtins[c]);
+    } 
 
     var arithmetic = new Array();
         arithmetic['add'] = function (x,y) {return x+y};
@@ -28,7 +33,16 @@ function Logo (turtle) {
         arithmetic['mul'] = function (x,y) {return x*y};
         arithmetic['div'] = function (x,y) {return x/y};
 
+    for (var c in arithmetic) {
+        this.p.addCommand(c,2);
+    } 
+
+    this.p.addCommand('repeat',2);
+    this.p.addCommand('make',2);
+    
+
     this.arithmetic = arithmetic;
+    this.builtins = builtins;
 
     this.run = function (code) {
         var js = new Array();
@@ -103,7 +117,7 @@ function Logo (turtle) {
                 } else {
                     return new Token('error','I can\'t make');
                 }
-            } else if (this.arithmetic[code.data]) {    // an arithmetic operation
+            } else if (this.arithmetic[code.data] != null) {    // an arithmetic operation
                 //alert("arith");
                 var x = this.eval(code.args[0]);
                 if (x == null) return new Token('error','Can\'t give null to '+code.data);
@@ -117,7 +131,7 @@ function Logo (turtle) {
                 //alert(""+x+" "+code.data+" "+y+" = "+result);
                 return result;
             
-            } else if (this.builtins[code.data]) {  // a turtle command
+            } else if (this.builtins[code.data] != null) {  // a turtle command
 
                 // it's a builtin
                 var f = this.turtle[code.data]
@@ -201,24 +215,8 @@ function Parser () {
         this.tk = tk;
     }
 
-    var grab = new Array();
-        grab['forward'] = 1;
-        grab['backward'] = 1;
-        grab['right'] = 1;
-        grab['left'] = 1;
-        grab['penwidth'] = 1;
-        
-        grab['repeat'] = 2;
-        grab['make'] = 2;
-        
-        grab['add'] = 2;
-        grab['sub'] = 2;
-        grab['mul'] = 2;
-        grab['div'] = 2;
+    this.grab = new Array();
 
-
-    this.grab = grab;
-        
     this.addCommand = function (wrd,n) {
         this.grab[wrd] = n;
 
