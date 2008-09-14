@@ -41,7 +41,7 @@ function run () {
         //form.code.value = ""
         
         var out = logo.run(code);
-        if (out.type == "error") {
+        if (out && out.type == "error") {
             alert(out.data);
         }
 }

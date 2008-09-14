@@ -3,27 +3,44 @@
 function Logo (turtle) {
     this.turtle = turtle;
 
-    this.symbols = new Array();
+    this.functions = new SymbolTable();
+    this.values = new SymbolTable();
     
+    this.t = new Tokenizer();
+    this.p = new Parser();
+
+    var builtins = new Array();
+        builtins['forward'] = true;
+        builtins['backward'] = true;
+        builtins['right'] = true;
+        builtins['left'] = true;
+        builtins['penup'] = true;
+        builtins['pendown'] = true;
+        builtins['clear'] = true;
+        builtins['reset'] = true;
+
+    this.builtins = builtins;
+
+
     this.run = function (code) {
         var js = new Array();
        
-        var t = new Tokenizer(code)
-        var p = new Parser(t); 
+        this.t.load(code);
+        this.p.load(this.t); 
         
         var i = null;
         
         do {
-            i = p.next();
-            if (p == null) return new Token('error','null parse tree received');
-            if (p.type == "error") return p;
-            if (p.type == "eof") {
-                p = null;
+            i = this.p.next();
+            if (i == null) return new Token('error','I can\'t parse this.');
+            if (i.type == "error") return i;
+            if (i.type == "eof") {
+                i = null;
                 break;
             }
             
             var out = this.eval(i);
-            if (out && out.type == "error") {return p;}
+            if (out && out.type == "error") {return out;}
             
             
         } while (1);
@@ -36,7 +53,9 @@ function Logo (turtle) {
         if (code == null) {
             return null;
         } else if (code.type == "def") {
-            this.symbols[code.data] =  code.args
+            this.functions.set(code.data,code.args);
+            //alert(code.args.args.length);
+            this.p.addCommand(code.data,code.args.args.length);
         } else if (code.type == "lst") {
             //alert('evaling list');
             this.eval_list(code.args);
@@ -44,24 +63,68 @@ function Logo (turtle) {
             if (code.data == "repeat") {
                // alert("repeat");
                 //alert(code.args[0].type);
-                if (code.args.length == 2 && code.args[0].type == "num") { 
-                    var limit = code.args[0].data;
+                if (code.args && code.args.length == 2) { 
+                    var limit = this.eval(code.args[0]);
                     var cmd = code.args[1];
                     for (var c = 0; c< limit; c++) {
                         this.eval(cmd);
                     }
                 } else {
-                    return new Token ('error','invalid args to repeat');
+                    return new Token ('error','I can\'t repeat.');
                 }
-            } else if (this.symbols[code.data] != null) {
-                // it's been defined.
-                this.eval_list(this.symbols[code.data]);
-            } else {
+            } else if (code.data == "make") {
+                if (code.args && code.args.length == 2) {
+                    if (code.args[0].type == "sym") {
+                        var name = this.eval(code.args[0]);
+                        var value = this.eval(code.args[1]);
+                        //alert("make "+name+" "+value);
+                        this.values.set(name,value);
+                    } else {
+                        return new Token('error','I can\'t make - '+code.args[0].data+' is not a symbol');
+                    }
+                } else {
+                    return new Token('error','I can\'t make');
+                }
+            } else if (this.builtins[code.data]) {
+
                 // it's a builtin
                 var f = this.turtle[code.data]
                 var l = this.eval_list(code.args)
                 f.apply(this.turtle,l);
+                return null;
+            
+            } else if (this.functions.get(code.data) != null) {
+
+                var f = this.functions.get(code.data);
+
+                if (code.args && code.args.length > 0) {
+                    var newvalues = new SymbolTable(this.values);
+
+                    for (var c = 0; c < code.args.length; c ++ ) {
+                        var name = f.args[c].data;
+                        var value = this.eval(code.args[c]);
+                        //alert("setting: "+name +":" +value);
+                        newvalues.set(name,value);
+
+                    }
+
+                    this.values = newvalues;
+                    var result = this.eval_list(f.code);
+
+                    this.values = this.values.par;
+                    return result
+
+                } else {
+                    return this.eval_list(f.code);
+                }
+
+            } else {
+                return new Token('error','I don\'t know how to ' + code.data);
             }
+        } else if (code.type == "var") {
+            var r = this.values.get(code.data);
+            //alert("getting:" + code.data + ":"+ r);
+            return r
         } else if (code.type == "num" || code.type == "sym") {
             return code.data;
         }
@@ -77,9 +140,29 @@ function Logo (turtle) {
         return ret;
     }
 }
-function Parser(tk) {
+
+function SymbolTable (par) {
+    this.par = par;
+    this.table = new Array();
+    this.get = function (key) {
+        var r = this.table[key];
+        if (r == null && this.par != null) {
+            t = this.par.get(key);
+        }
+        return r;
+    }
+    this.set = function (key,value) {
+        this.table[key] = value;
+    }
+}
+
+function Parser () {
     
-    this.tk = tk
+    this.tk = null;
+
+    this.load = function(tk) {
+        this.tk = tk;
+    }
 
     var grab = new Array();
         grab['forward'] = 1;
@@ -87,21 +170,23 @@ function Parser(tk) {
         grab['right'] = 1;
         grab['left'] = 1;
         
-    
         grab['repeat'] = 2;
+        grab['make'] = 2;
         
     this.grab = grab;
         
     this.addCommand = function (wrd,n) {
-        this.grab['wrd'] = n;
+        this.grab[wrd] = n;
+
     }
     
     this.next = function () {
         
         var token = this.tk.next();
+
         //alert("got token: "+token);
         
-        if (token == null) return new Token('error','null token received');
+        if (token == null) return new Token('error','I don\'t know how to tokenize this.');
         
         if (token.type == "error") return token;
         
@@ -112,32 +197,43 @@ function Parser(tk) {
         
         if (token.type == "wrd") {
             if (token.data == "to") {
-                var args = new Array();
-                do {
-                    var i = this.next();
-                    
-                    if (i == null) return new Token('error','null token received');
-                    if (i.type == "error") return i;
-                    if (i.type == "eof") return new Token('error','premature eof');
-                 
-                    if (i.type == "wrd" && i.data == 'end') break;
-                    
-                    args.push(i);
-                } while (1);
-                //alert("end of list");
-                
-                var name = args.shift()
+                var code = new Array();
+
+                var name = this.tk.next();
+
+                if (name == null) return new Token('error','I don\'t know how to tokenize this');
+                if (name.type == "error") return i;
+                if (name.type == "eof") return new Token('error','You need to say what the name os for to.');
                 
                 if (name.type == "wrd") {
                     name = name.data;
                 } else {
-                    return new Token('error','expected word, got something else');
+                    return new Token('error',name.data + " is not a good name for a function");
                 }
+
+                do {
+                    var i = this.next();
+                    
+                    if (i == null) return new Token('error','I don\'t know how to tokenize this');
+                    if (i.type == "error") return i;
+                    if (i.type == "eof") return new Token('error','You can\'t have an endless to');
+                 
+                    if (i.type == "wrd" && i.data == 'end') break;
+                    
+                    code.push(i);
+                } while (1);
+                //alert("end of list");
                 
+                var args = new Array();
+                while (code[0].type == "var") {
+                    args.push(code.shift());
+                }
+
                 token.type = "def";
                 token.data = name;
                 
-                token.args = args;
+                token.args = new Command(args,code);
+
                 //alert(token);
             
             } else if (token.data == '[') {
@@ -146,9 +242,9 @@ function Parser(tk) {
                 do {
                     var i = this.next();
                     
-                    if (i == null) return new Token('error','null token received');
+                    if (i == null) return new Token('error','I don\'t know how to tokenize this');
                     if (i.type == "error") return i;
-                    if (i.type == "eof") return new Token('error','premature eof');
+                    if (i.type == "eof") return new Token('error','Lists have a start "[", middle and and end "]". Yours does not have an end');
                  
                     if (i.type == "wrd" && i.data == ']') break;
                     
@@ -163,14 +259,16 @@ function Parser(tk) {
             
             } else {
                  var g = this.grab[token.data];
+                 //alert("grabbing "+g+" for "+token.data);
                  if (g != null) {
                      var args = new Array();
+                     var t = g;
                      while (g > 0) {
                         var i = this.next();
                         
-                        if (i == null) return new Token('error','null token received');
+                        if (i == null) return new Token('error','I don\'t know how to tokenize this');
                         if (i.type == "error") return i;
-                        if (i.type == "eof") return new Token('error','premature eof');
+                        if (i.type == "eof") return new Token('error','I can\'t '+ token.data+", it needs "+g+" more arguments, I got "+(t-g)+".");
                           
                         args.push(i);
                         g--;
@@ -187,18 +285,30 @@ function Parser(tk) {
     }
 }
 
+function Command (args,code) {
+    this.args = args;
+    this.code = code;
+    
+}
+
 function Token(type,data) {
     this.type = type;
     this.data = data;
     this.args = null; 
+    this.code = null;
+
     this.toString = function () {
         return "(" + type + ")" + data ;
     }
 }
 
-function Tokenizer(text) {
+function Tokenizer () {
 
-    this.text = text;
+    this.text = null;
+
+    this.load = function (text) {
+        this.text = text;
+    }
 
 
     var norm = new Array();
