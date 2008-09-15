@@ -18,6 +18,8 @@ function Turtle (canvas) {
 
     this.c.lineCap = "round";
     
+    this.colormap = new Array();
+    
     this.delay = function (x) {
         this.wait = x;
     }
@@ -42,11 +44,14 @@ function Turtle (canvas) {
         this.c.lineWidth=w;
     }
 
-    this.colour = function (r,g,b) {
-        this.c.strokeStyle = "rgb("+r+","+g+","+b+")";
+    this.color = function (args) {
+        if (args.length == 3) {
+            this.c.strokeStyle = "rgb("+args[0]+","+args[1]+","+args[2]+")";
+        } else if (this.colormap[args] != null) {
+            this.color(this.colormap[args]);
+        }
     }
     
-    this.color = this.colour;
     
     this.forward = function (d) {
         this.c.beginPath();
@@ -69,53 +74,45 @@ function Turtle (canvas) {
         this.y = newy;
     }
     
-    this.fw = this.forward;
-   
     this.backward = function (d) {
         this.forward(-d);
     }
     
-    this.bk = this.backward;
     
     this.right = function(angle) {
         this.angle = (this.angle + angle) % 360;
     }
     
-    this.rt = this.right;
     
     this.left = function(angle) {
         this.right(-angle);
     }
 
-    this.lt = this.left;
     
     this.penup = function() {
         this.pen = false;
     }
 
-    this.pd = this.penup;
 
     this.pendown = function() {
         this.pen = true;
     }
 
-    this.pd = this.pendown;
 
     this.radians = function() {
         return this.angle / 180 * Math.PI;
     }
 
-    this.clear = function() {
+    this.clearscreen = function() {
         old = this.c.fillStyle
         this.c.fillStyle = "rgb(255,255,255)";
         this.c.fillRect(0,0,this.max_x,this.max_y);
         this.c.fillStyle = old
     }
 
-    this.cs = this.clear;
 
     this.reset = function() {
-        this.clear();
+        this.clearscreen();
         this.setup();
     }
 
@@ -124,7 +121,7 @@ function Turtle (canvas) {
         this.y = this.max_y/2;
         this.angle = 270;
         this.penwidth(1);
-        this.color(0,0,0);
+        this.color([0,0,0]);
         this.pen = true;
     }
 

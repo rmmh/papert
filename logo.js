@@ -19,14 +19,18 @@ function Logo () {
     this.primitive = new Array();
     this.command = new Array();
     this.turtle_command = new Array();
+    this.constant = new Array();
     
     this.alias = new Array();
     
     this.addAlias = function (name, wrd) {
         this.alias[name] = wrd;
     }
-
     
+    this.addConstant = function(name, value) {
+        this.constant[name] = value;
+    };
+
     this.addCommand   = function(name, grab, aliases, fun) {
         this.command[name] = fun
         this.addBuiltin(name, grab,aliases);
@@ -54,37 +58,105 @@ function Logo () {
 
     this.setup = function () {
     
-        this.addTurtleCommand('forward',1,['fw']);
-        this.addTurtleCommand('backward',1,['bw']);
-        this.addTurtleCommand('right',1,['rt']);
-        this.addTurtleCommand('left',1,['lt']);
+        this.addCommand('forward',1,['fw'], function (a) { 
+            if (parseInt(a[0]) != a[0]) return new Token('error','Can only go forward a whole number, not '+a[0])
+            this.turtle.forward(a[0]);
+        });
+        
+        this.addCommand('backward',1,['bw'], function (a) { 
+            if (parseInt(a[0]) != a[0]) return new Token('error','Can only go backward a whole number, not '+a[0])
+            this.turtle.backward(a[0]);
+        });
+        this.addCommand('right',1,['rt'], function (a) { 
+            if (parseFloat(a[0]) != a[0]) return new Token('error','Can only turn right a number of degrees, not '+a[0])
+            this.turtle.right(a[0]);
+        });
+        this.addCommand('left',1,['lt'], function (a) { 
+            if (parseFloat(a[0]) != a[0]) return new Token('error','Can only turn left a number of degrees, not '+a[0])
+            this.turtle.left(a[0]);
+        });
+        
         this.addTurtleCommand('penup',1,['pu']);
         this.addTurtleCommand('pendown',1,['pd']);
         
-        this.addTurtleCommand('color',3,['colour']);
-        this.addTurtleCommand('penwidth',1,null);
-        this.addTurtleCommand('clear',0,['cs','clearscreen']);
+        this.addTurtleCommand('color',1,['colour']);
+        
+        this.addCommand('penwidth',1,null, function (a) { 
+            if (parseInt(a[0]) != a[0]) return new Token('error','Pen widths can only be a whole number, not '+a[0])
+            this.turtle.penwidth(a[0]);
+        });
+        
+        this.addTurtleCommand('clearscreen',0,['cs','clear']);
         
         this.addTurtleCommand('reset',0,null);
         
-        this.addCommand('add',2,['sum'],function (a) {return a[0]+a[1]});
-        this.addCommand('sub',2,['difference'],function (a) {return a[0]-a[1]});
-        this.addCommand('mul',2,['product'],function (a) {return a[0]*a[1]});
-        this.addCommand('div',2,['divide'],function (a) {return a[0]/a[1]});
-            
+        this.addCommand('sum',2,['add'],function (a) {return a[0]+a[1]});
+        this.addCommand('difference',2,['sub'],function (a) {return a[0]-a[1]});
+        this.addCommand('product',2,['mul'],function (a) {return a[0]*a[1]});
+        this.addCommand('divide',2,['div'],function (a) {return a[0]/a[1]});
+        this.addCommand('modulo',2,['mod'],function (a) {return a[0]%a[1]});
+        this.addCommand('minus',1,null,function (a) {return -a[0]});
+
+
+        this.addCommand('or',2,null,function (a) {return a[0] || a[1]});
+        this.addCommand('and',2,null,function (a) {return a[0] && a[1]});
+        this.addCommand('not',1,null,function (a) {return !a[0]});
+
+        this.addCommand('equals?',2,null,function (a) {return a[0] == a[1]});
+        this.addCommand('less?',2,null,function (a) {return a[0] < a[1]});
+        this.addCommand('greater?',2,null,function (a) {return a[0] > a[1]});
+       
+        this.addConstant('stop','stop');
+       
+
         this.addPrimitive('repeat',2,null,function (args) {
                 if (args && args.length == 2) { 
                     var limit = this.eval(args[0]);
                     if (limit == null) return new Token('error','Don\'t know how many times to repeat');
                     if (limit && limit.type == "error") return limit;
-    
+                    if (limit != parseInt(limit)) return new Token('error','I can only repeat things a whole number of times, and '+ limit+' is not a whole number');
+                    
                     var cmd = args[1];
                     for (var c = 0; c< limit; c++) {
                         var res = this.eval(cmd);
                         if (res && res.type == "error") return res;
+                        if (res == "stop") return null;
                     }
                 } else {
                     return new Token ('error','I can\'t repeat.');
+                }
+            
+            }
+        );
+        
+        this.addPrimitive('if',2,null,function (args) {
+                if (args && args.length == 2) { 
+                    var cond = this.eval(args[0]);
+                    if (cond && cond.type == "error") return limit;
+
+                    if (cond) {
+                        return this.eval(args[1]);
+                    }
+                } else {
+                    return new Token ('error','I can\'t if.');
+                }
+            
+            }
+        );
+        
+        
+        this.addPrimitive('ifelse',3,null,function (args) {
+                if (args && args.length == 3) { 
+                    var cond = this.eval(args[0]);
+                    if (cond && cond.type == "error") return limit;
+
+                    if (cond) {
+                        return this.eval(args[1]);
+                    } else {
+                        return this.eval(args[2]);
+                    }
+                } else {
+                    return new Token ('error','I can\'t if.');
                 }
             
             }
@@ -109,6 +181,10 @@ function Logo () {
                 }
             }
         )
+        
+        this.addConstant('true',true);
+        this.addConstant('false',false);
+        
     }
     
     
@@ -145,7 +221,6 @@ function Logo () {
         } else if (code.type == "def") {        // a definition: to ....
             this.functions.set(code.data,code.args);
             //alert(code.args.args.length);
-            this.p.addCommand(code.data,code.args.args.length);
         } else if (code.type == "lst") {        // a list of items
             //alert('evaling list');
             return this.eval_list(code.args);
@@ -155,7 +230,11 @@ function Logo () {
                 code.data = this.alias[code.data];
             }
             
-            if (this.primitive[code.data] != null) {    // an primitive operation, don't eval args
+            if (this.constant[code.data] != null) {    // a constant
+
+                return this.constant[code.data];
+                
+            } else if (this.primitive[code.data] != null) {    // an primitive operation, don't eval args
                 var f = this.primitive[code.data];
                 var l = code.args;
                 
@@ -203,6 +282,8 @@ function Logo () {
 
                 this.values = newvalues;
                 var result = this.eval_list(f.code);
+                
+                if (result == "stop") { result = null };
 
                 this.values = this.values.par;
                 return result
@@ -228,6 +309,8 @@ function Logo () {
             var res = this.eval(args[i]);
             if (res && res.type == "error") {
                 return res;
+            } else if (res == "stop") {
+                return "stop";
             } else {
                 ret.push(res);
             }
@@ -285,8 +368,7 @@ function Parser () {
         
         if (token.type == "wrd") {
             if (token.data == "to") {
-                var code = new Array();
-
+                
                 var name = this.tk.next();
 
                 if (name == null) return new Token('error','I don\'t know how to tokenize this');
@@ -299,8 +381,28 @@ function Parser () {
                     return new Token('error',name.data + " is not a good name for a function");
                 }
 
+                var args = new Array();
+                
+                var i = null;
                 do {
-                    var i = this.next();
+                    i = this.next();
+                    
+                    if (i == null) return new Token('error','I don\'t know how to tokenize this');
+                    if (i.type == "error") return i;
+                    if (i.type == "eof") return new Token('error','You can\'t have an endless to');
+                 
+                    if (i.type !="var") break;
+                    
+                    args.push(i);
+                    this.addCommand(name, args.length);
+                    
+                } while (1);
+                
+                
+                
+                var code = new Array();
+                
+                do {
                     
                     if (i == null) return new Token('error','I don\'t know how to tokenize this');
                     if (i.type == "error") return i;
@@ -309,14 +411,12 @@ function Parser () {
                     if (i.type == "wrd" && i.data == 'end') break;
                     
                     code.push(i);
+                    
+                    i = this.next();
                 } while (1);
+                
                 //alert("end of list");
                 
-                var args = new Array();
-                while (code[0].type == "var") {
-                    args.push(code.shift());
-                }
-
                 token.type = "def";
                 token.data = name;
                 
@@ -398,7 +498,7 @@ function Tokenizer () {
         this.text = text;
     }
     
-    this.wrd_rx = /^\s*([a-zA-Z]\w*|\[|\])\s*/i;
+    this.wrd_rx = /^\s*([a-zA-Z]\w*\??|\[|\])\s*/i;
     this.var_rx = /^\s*:([a-zA-Z]\w*)\s*/i;
     this.num_rx = /^\s*(\d+(?:\.\d+)?)\s*/i;
     this.sym_rx = /^\s*"([a-zA-Z]\w*)\s*/i;
