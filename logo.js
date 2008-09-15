@@ -76,8 +76,8 @@ function Logo () {
             this.turtle.left(a[0]);
         });
         
-        this.addTurtleCommand('penup',1,['pu']);
-        this.addTurtleCommand('pendown',1,['pd']);
+        this.addTurtleCommand('penup',0,['pu']);
+        this.addTurtleCommand('pendown',0,['pd']);
         
         this.addTurtleCommand('color',1,['colour']);
         
