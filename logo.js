@@ -319,7 +319,7 @@ function Logo () {
             } else if (this.functions.get(code.data) != null) { // a user defined function
 
                 var f = this.functions.get(code.data);
-
+                var last = f.code[f.code.length-1];
                 var newvalues = new SymbolTable(this.values);
 
                 for (var c = 0; c < code.args.length; c ++ ) {
@@ -332,15 +332,39 @@ function Logo () {
                     newvalues.set(name,value);
 
                 }
-
                 this.values = newvalues;
-                var result = this.eval_list(f.code);
                 
-                if (result == "stop") { result = null };
-
-                this.values = this.values.par;
-                return result
-
+                if (last.type == "wrd" && last.data == code.data) {
+                     var tail = f.code.pop();
+                     while (1) {
+                        
+                        var result = this.eval_list(f.code);
+                        
+                        if (result == "stop") { return null;};
+                        
+                        newvalues = new SymbolTable(this.values.par);
+                        
+                        for (var c = 0; c < code.args.length; c ++ ) {
+                            var name = f.args[c].data;
+                            var value = this.eval(tail.args[c]);
+                            if (value == null) return new Token('error','Can\'t pass a null to '+code.data);
+                            if (value && value.type == 'error') return value;
+        
+                            //alert("setting: "+name +":" +value);
+                            newvalues.set(name,value);
+        
+                        }
+                        
+                        this.values = newvalues;
+                    }
+                } else {
+                    var result = this.eval_list(f.code);
+                    
+                    if (result == "stop") { result = null };
+    
+                    this.values = this.values.par;
+                    return result
+                }
             } else {
                 return new Token('error','I don\'t know how to ' + code.data);
             }
