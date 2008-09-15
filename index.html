@@ -61,21 +61,17 @@ Is broken
 <div id="oldcode">&nbsp;</div>
 <div>
 <textarea id="code">
-to polygon :sides :length
-repeat :sides [right div 360 :sides forward :length]
-end
-
-to triangle :length
-polygon 3 :length
-end
-
-to heptangle :length
-polygon 7 :length
+to spiral :co :lm
+forward :co
+right 30
+color [0 mul 2 :co sub 255 :co]
+penwidth mod :co 10
+make "co add :co 1
+ifelse less? :co :lm [spiral :co :lm] [stop]
 end
 
 reset
-
-repeat 10 [triangle 100 rt 36 heptangle 88]
+spiral 1 100
 
 </textarea></div>
 <div>
