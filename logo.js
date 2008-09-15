@@ -80,7 +80,31 @@ function Logo () {
             if (parseFloat(a[0]) != a[0]) return new Token('error','Can only turn left a number of degrees, not '+a[0])
             this.turtle.left(a[0]);
         });
+
+        this.addCommand('setx',1,null, function (a) { 
+            if (parseInt(a[0]) != a[0]) return new Token('error','Can only set x to a whole number, not '+a[0])
+            this.turtle.setx(a[0]);
+        });
+
+        this.addCommand('sety',1,null, function (a) { 
+            if (parseInt(a[0]) != a[0]) return new Token('error','Can only set y to a whole number, not '+a[0])
+            this.turtle.sety(a[0]);
+        });
         
+        this.addCommand('setheading',1,['seth'], function (a) { 
+            alert('foo');
+            if (parseInt(a[0]) != a[0]) return new Token('error','Can only set heading to a whole number, not '+a[0])
+            this.turtle.setheading(a[0]);
+        });
+
+        this.addCommand('setxy',2,null, function () { 
+            if (parseInt(a[0]) != a[0]) return new Token('error','When using setxy, you can only set x to a whole number, not '+a[0])
+            if (parseInt(a[1]) != a[1]) return new Token('error','When using setxy, you can only set y to a whole number, not '+a[1])
+            this.turtle.setxy(a[0],a[1]);
+        });
+
+        
+
         this.addTurtleCommand('penup',0,['pu']);
         this.addTurtleCommand('pendown',0,['pd']);
         
@@ -230,7 +254,7 @@ function Logo () {
         }
     
     this.eval = function (code) {
-        //alert("evaling "+code);
+        //alert("evaling "+code.type);
         if (code == null) {
             return null;
         } else if (code.type == "def") {        // a definition: to ....
@@ -240,7 +264,6 @@ function Logo () {
             //alert('evaling list');
             return this.eval_list(code.args);
         } else if (code.type == "wrd") {        // a command
-        
             if (this.alias[code.data] != null) {
                 code.data = this.alias[code.data];
             }
@@ -274,7 +297,6 @@ function Logo () {
                 var f = this.turtle[code.data];
                 var l = this.eval_list(code.args);
                 if (l && l.type == 'error') return l;
-
                 f.apply(this.turtle,l);
                 return null;
             
@@ -387,10 +409,54 @@ function Parser () {
         if (token.type == "eof") {
             this.tk = null;
             return token;
-        }
-        
-        if (token.type == "wrd") {
-            if (token.data == "to") {
+        } else if (token.type == "ops") {
+            //alert("ops");
+            if (token.data == '(') {
+            
+                var args = new Array();
+                do {
+                    var i = this.next();
+                    
+                    if (i == null) return new Token('error','I don\'t know how to tokenize this');
+                    if (i.type == "error") return i;
+                    if (i.type == "eof") return new Token('error','You\'re missing a )');
+                 
+                    if (i.type == "ops" && i.data == ')') break;
+                    
+                    args.push(i);
+                } while (1);
+                //alert("end of list");
+                if (args.length == 1) {
+                    token = args[0];
+                } else{
+                    token.type = "lst";
+                    token.data
+                    token.args = args;
+                } 
+                //alert(token);
+            
+            } else if (token.data == '[') {
+            
+                var args = new Array();
+                do {
+                
+                    var i = this.next();
+                    
+                    if (i == null) return new Token('error','I don\'t know how to tokenize this');
+                    if (i.type == "error") return i;
+                    if (i.type == "eof") return new Token('error','You\'re missing a ]');
+                 
+                    if (i.type == "ops" && i.data == ']') break;
+                    
+                    args.push(i);
+                } while (1);
+                //alert("end of list");
+                
+                token.type = "lst";
+                token.data
+                token.args = args;
+                //alert(token);
+            } else if (token.data == "to") {
                 
                 var name = this.tk.next();
 
@@ -431,7 +497,7 @@ function Parser () {
                     if (i.type == "error") return i;
                     if (i.type == "eof") return new Token('error','to '+name+' needs an end');
                     
-                    if (i.type == "wrd" && i.data == 'end') break;
+                    if (i.type == "ops" && i.data == 'end') break;
                     
                     code.push(i);
                     
@@ -446,85 +512,40 @@ function Parser () {
                 token.args = new Command(args,code);
 
                 //alert(token);
-            
-            } else if (token.data == '(') {
-            
-                var args = new Array();
-                do {
-                    var i = this.next();
-                    
-                    if (i == null) return new Token('error','I don\'t know how to tokenize this');
-                    if (i.type == "error") return i;
-                    if (i.type == "eof") return new Token('error','You\'re missing a )');
-                 
-                    if (i.type == "wrd" && i.data == ')') break;
-                    
-                    args.push(i);
-                } while (1);
-                //alert("end of list");
-                if (args.length == 1) {
-                    token = args[0];
-                } else{
-                    token.type = "lst";
-                    token.data
-                    token.args = args;
-                } 
-                //alert(token);
-            
-            } else if (token.data == '[') {
-            
-                var args = new Array();
-                do {
-                
-                    var i = this.next();
-                    
-                    if (i == null) return new Token('error','I don\'t know how to tokenize this');
-                    if (i.type == "error") return i;
-                    if (i.type == "eof") return new Token('error','You\'re missing a ]');
-                 
-                    if (i.type == "wrd" && i.data == ']') break;
-                    
-                    args.push(i);
-                } while (1);
-                //alert("end of list");
-                
-                token.type = "lst";
-                token.data
-                token.args = args;
-                //alert(token);
-            
-            } else {
-                 var g = this.grab[token.data];
-                 //alert("grabbing "+g+" for "+token.data);
-                 if (g != null) {
-                     var args = new Array();
-                     var t = g;
-                     while (g > 0) {
-                        var i = this.next();
-                        
-                        if (i == null) return new Token('error','I don\'t know how to tokenize this');
-                        if (i.type == "error") return i;
-                        if (i.type == "eof") return new Token('error','I can\'t '+ token.data+", it needs "+g+" more arguments, I got "+(t-g)+".");
-                          
-                        args.push(i);
-                        g--;
-                        //alert(i.type+i.data);
-                    }
-                    token.args = args;
-                 }
             }
+        } else if (token.type == "wrd") {
+             var g = this.grab[token.data];
+             //alert("grabbing "+g+" for "+token.data);
+             if (g != null) {
+                 var args = new Array();
+                 var t = g;
+                 while (g > 0) {
+                    var i = this.next();
+                    
+                    if (i == null) return new Token('error','I don\'t know how to tokenize this');
+                    if (i.type == "error") return i;
+                    if (i.type == "eof") return new Token('error','I can\'t '+ token.data+", it needs "+g+" more arguments, I got "+(t-g)+".");
+                      
+                    args.push(i);
+                    g--;
+                    //alert(i.type+i.data);
+                }
+                token.args = args;
+             }
         }
-        if (token.data != ']' && token.data != ')' && token.data != 'end' ) while (1) {
+        if (token.type != 'ops' ) while (1) {
             var look = this.tk.peek()
-            //alert("lookahead = "+look+" " +this.infix[look] ) ;
+            //alert("lookahead = "+look+" " +this.infix[look.data] ) ;
             if (look && this.infix[look.data] && this.infix[look.data] < precedent) {
                 //alert("whee, an infix op");
                 var op_token = this.tk.next();
+                op_token.type = "wrd";
                 //alert(op_token);
                 var right = this.next(this.infix[look.data]);
                 //alert(right);
                 op_token.args = new Array(token, right);
                 token = op_token;
+                
             
             } else {
                 break;
@@ -562,7 +583,8 @@ function Tokenizer () {
     
     this.cache = new Array()
     
-    this.wrd_rx = /^\s*(\+|\-|\*|\/|\%|\<|\>|\=|[a-zA-Z]\w*\??|\[|\]|\(|\))\s*/i;
+    this.ops_rx = /^\s*(\+|\-|\*|\/|\%|\<|\>|\=|\[|\]|\(|\)|to|end)\s*/i;
+    this.wrd_rx = /^\s*([a-zA-Z]\w*\??)\s*/i;
     this.var_rx = /^\s*:([a-zA-Z]\w*)\s*/i;
     this.num_rx = /^\s*(\d+(?:\.\d+)?)\s*/i;
     this.sym_rx = /^\s*"([a-zA-Z]\w*)\s*/i;
@@ -587,6 +609,9 @@ function Tokenizer () {
         if (this.empty.exec(this.text)) {
             this.text = null;
             return new Token('eof','');
+        } else if ((result = this.ops_rx.exec(this.text)) != null) {
+            this.text = this.text.substring(result[0].length)
+            return new Token('ops',result[1]);
 
         } else if ((result = this.wrd_rx.exec(this.text)) != null) {
             this.text = this.text.substring(result[0].length)

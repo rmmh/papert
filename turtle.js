@@ -14,8 +14,6 @@ function Turtle (canvas) {
     this.max_x = canvas.width;
     this.max_y = canvas.height;
     
-    this.x = canvas.width/2;
-
     this.c.lineCap = "round";
     
     this.colormap = new Array();
@@ -35,9 +33,21 @@ function Turtle (canvas) {
         }
    }
 
-    this.jump = function(x,y) {
+    this.setxy = function(x,y) {
         this.x = x;
         this.y = y;
+    }
+    
+    this.setx = function(x) {
+        this.x = x;
+    }
+    
+    this.sety = function(x,y) {
+        this.x = x;
+    }
+    
+    this.setheading = function(h) {
+        this.angle = (270+h) % 360
     }
     
     this.penwidth = function(w) {
@@ -116,10 +126,14 @@ function Turtle (canvas) {
         this.setup();
     }
 
-    this.setup = function() {
+    this.home = function() {
         this.x = this.max_x/2;
         this.y = this.max_y/2;
         this.angle = 270;
+    }
+    
+    this.setup = function() {
+        this.home();
         this.penwidth(1);
         this.color([0,0,0]);
         this.pen = true;
