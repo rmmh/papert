@@ -16,8 +16,6 @@ function Turtle (canvas) {
     
     this.c.lineCap = "round";
     
-    this.colormap = new Array();
-    
     this.delay = function (x) {
         this.wait = x;
     }
@@ -55,11 +53,7 @@ function Turtle (canvas) {
     }
 
     this.color = function (args) {
-        if (args.length == 3) {
             this.c.strokeStyle = "rgb("+args[0]+","+args[1]+","+args[2]+")";
-        } else if (this.colormap[args] != null) {
-            this.color(this.colormap[args]);
-        }
     }
     
     this.arc = function (radius, angle) {

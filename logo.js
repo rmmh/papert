@@ -120,7 +120,11 @@ function Logo () {
         this.addTurtleCommand('pendown',0,['pd']);
         this.addTurtleCommand('home',0,null);
         
-        this.addTurtleCommand('color',1,['colour']);
+        this.addCommand('color',1,['colour'], function (a) { 
+            if (a[0].length != 3 ) return new Token('error','When using color, pass it a list like [r g b], not '+a[0])
+ 
+            this.turtle.color(a[0]);
+        });
         
         this.addCommand('penwidth',1,null, function (a) { 
             if (parseInt(a[0]) != a[0]) return new Token('error','Pen widths can only be a whole number, not '+a[0])
