@@ -1,49 +1,117 @@
 // $Id$
 
-function Logo (turtle) {
-    this.turtle = turtle;
 
+    
+
+function Logo () {
+    this.turtle = null;
+    
+    this.setTurtle = function(turtle) {
+        this.turtle = turtle;
+    }
+    
     this.functions = new SymbolTable();
     this.values = new SymbolTable();
     
     this.t = new Tokenizer();
     this.p = new Parser();
-
-    var builtins = new Array();
-        builtins['forward'] = 1;
-        builtins['backward'] = 1;
-        builtins['right'] = 1;
-        builtins['left'] = 1;
-        builtins['penup'] = 0;
-        builtins['pendown'] = 0;
-        builtins['clear'] = 0;
-        builtins['reset'] = 0;
-        builtins['penwidth'] = 1;
-        builtins['color'] = 3;
-        builtins['colour'] = 3;
-
-
-    for (var c in builtins) {
-        this.p.addCommand(c,builtins[c]);
-    } 
-
-    var arithmetic = new Array();
-        arithmetic['add'] = function (x,y) {return x+y};
-        arithmetic['sub'] = function (x,y) {return x-y};
-        arithmetic['mul'] = function (x,y) {return x*y};
-        arithmetic['div'] = function (x,y) {return x/y};
-
-    for (var c in arithmetic) {
-        this.p.addCommand(c,2);
-    } 
-
-    this.p.addCommand('repeat',2);
-    this.p.addCommand('make',2);
     
+    this.primitive = new Array();
+    this.command = new Array();
+    this.turtle_command = new Array();
+    
+    this.alias = new Array();
+    
+    this.addAlias = function (name, wrd) {
+        this.alias[name] = wrd;
+    }
 
-    this.arithmetic = arithmetic;
-    this.builtins = builtins;
+    
+    this.addCommand   = function(name, grab, aliases, fun) {
+        this.command[name] = fun
+        this.addBuiltin(name, grab,aliases);
+        };
 
+    this.addPrimitive = function(name, grab, aliases, fun) {
+        this.primitive[name] = fun
+        this.addBuiltin(name, grab,aliases);
+    };
+
+    this.addTurtleCommand = function(name, grab, aliases) {
+        this.turtle_command[name] = grab;
+        this.addBuiltin(name, grab,aliases);
+    };
+
+    this.addBuiltin = function(name,grab,aliases) {
+        this.p.addCommand(name, grab);
+        if (aliases != null && aliases.length) {
+            for (var a in aliases) {
+                this.addAlias(aliases[a],name);
+                this.p.addCommand(aliases[a], grab);
+            }
+        }
+    }
+
+    this.setup = function () {
+    
+        this.addTurtleCommand('forward',1,['fw']);
+        this.addTurtleCommand('backward',1,['bw']);
+        this.addTurtleCommand('right',1,['rt']);
+        this.addTurtleCommand('left',1,['lt']);
+        this.addTurtleCommand('penup',1,['pu']);
+        this.addTurtleCommand('pendown',1,['pd']);
+        
+        this.addTurtleCommand('color',3,['colour']);
+        this.addTurtleCommand('penwidth',1,null);
+        this.addTurtleCommand('clear',0,['cs','clearscreen']);
+        
+        this.addTurtleCommand('reset',0,null);
+        
+        this.addCommand('add',2,['sum'],function (a) {return a[0]+a[1]});
+        this.addCommand('sub',2,['difference'],function (a) {return a[0]-a[1]});
+        this.addCommand('mul',2,['product'],function (a) {return a[0]*a[1]});
+        this.addCommand('div',2,['divide'],function (a) {return a[0]/a[1]});
+            
+        this.addPrimitive('repeat',2,null,function (args) {
+                if (args && args.length == 2) { 
+                    var limit = this.eval(args[0]);
+                    if (limit == null) return new Token('error','Don\'t know how many times to repeat');
+                    if (limit && limit.type == "error") return limit;
+    
+                    var cmd = args[1];
+                    for (var c = 0; c< limit; c++) {
+                        var res = this.eval(cmd);
+                        if (res && res.type == "error") return res;
+                    }
+                } else {
+                    return new Token ('error','I can\'t repeat.');
+                }
+            
+            }
+        );
+            
+        this.addPrimitive('make',2,null,function (args) {
+                if (args && args.length == 2) {
+                    if (args[0].type == "sym") {
+                        var name = this.eval(args[0]);
+                        if (name == null) return new Token('error','Can\'t make with no name');
+                        if (name && name.type == "error") return name;
+                
+                        var value = this.eval(args[1]);
+                        if (value == null) return new Token('error','Can\'t set '+name+' to null');
+                        if (value && value.type == "error") return value;
+                
+                        //alert("make "+name+" "+value);
+                        this.values.set(name,value);
+                    } else {
+                        return new Token('error','I can\'t make - '+args[0].data+' is not a symbol');
+                    }
+                }
+            }
+        )
+    }
+    
+    
     this.run = function (code) {
         var js = new Array();
        
@@ -82,60 +150,35 @@ function Logo (turtle) {
             //alert('evaling list');
             return this.eval_list(code.args);
         } else if (code.type == "wrd") {        // a command
-            if (code.data == "repeat") {        // repeat n args
-               // alert("repeat");
-                //alert(code.args[0].type);
-                if (code.args && code.args.length == 2) { 
-                    var limit = this.eval(code.args[0]);
-                    if (limit == null) return new Token('error','Don\'t know how many times to repeat');
-                    if (limit && limit.type == "error") return limit;
-
-                    var cmd = code.args[1];
-                    for (var c = 0; c< limit; c++) {
-                        var res = this.eval(cmd);
-                        if (res && res.type == "error") return res;
-                    }
-                } else {
-                    return new Token ('error','I can\'t repeat.');
-                }
-            } else if (code.data == "make") {   // make "sym val
-                if (code.args && code.args.length == 2) {
-                    if (code.args[0].type == "sym") {
-                        var name = this.eval(code.args[0]);
-                        if (name == null) return new Token('error','Can\'t make with no name');
-                        if (name && name.type == "error") return name;
-
-                        var value = this.eval(code.args[1]);
-                        if (value == null) return new Token('error','Can\'t set '+name+' to null');
-                        if (value && value.type == "error") return value;
-
-                        //alert("make "+name+" "+value);
-                        this.values.set(name,value);
-                    } else {
-                        return new Token('error','I can\'t make - '+code.args[0].data+' is not a symbol');
-                    }
-                } else {
-                    return new Token('error','I can\'t make');
-                }
-            } else if (this.arithmetic[code.data] != null) {    // an arithmetic operation
-                //alert("arith");
-                var x = this.eval(code.args[0]);
-                if (x == null) return new Token('error','Can\'t give null to '+code.data);
-                if (x && x.type == "error") return x;
-
-                var y = this.eval(code.args[1]);
-                if (y == null) return new Token('error','Can\'t give null to '+code.data);
-                if (y && y.type == "error") return y;
-
-                var result = this.arithmetic[code.data](x,y);
-                //alert(""+x+" "+code.data+" "+y+" = "+result);
+        
+            if (this.alias[code.data] != null) {
+                code.data = this.alias[code.data];
+            }
+            
+            if (this.primitive[code.data] != null) {    // an primitive operation, don't eval args
+                var f = this.primitive[code.data];
+                var l = code.args;
+                
+                if (l && l.type == 'error') return l;
+                
+                var result = f.call(this,l);
+                
+                return result;
+            } else if (this.command[code.data] != null) {    // an command operation, eval args.
+                var f = this.command[code.data];
+                var l = this.eval_list(code.args);
+                
+                if (l && l.type == 'error') return l;
+                
+                var result = f.call(this,l);
+                
                 return result;
             
-            } else if (this.builtins[code.data] != null) {  // a turtle command
+            } else if (this.turtle_command[code.data] != null) {  // a turtle command, eval and pass to the turtle.
 
                 // it's a builtin
-                var f = this.turtle[code.data]
-                var l = this.eval_list(code.args)
+                var f = this.turtle[code.data];
+                var l = this.eval_list(code.args);
                 if (l && l.type == 'error') return l;
 
                 f.apply(this.turtle,l);
@@ -171,6 +214,7 @@ function Logo (turtle) {
             var r = this.values.get(code.data);
             //alert("getting:" + code.data + ":"+ r);
             return r
+            
         } else if (code.type == "num" || code.type == "sym") { // a number / symbol
             return code.data;
         }
@@ -190,6 +234,8 @@ function Logo (turtle) {
         }
         return ret;
     }
+    
+    this.setup();
 }
 
 function SymbolTable (par) {
@@ -216,12 +262,12 @@ function Parser () {
     }
 
     this.grab = new Array();
-
+    
     this.addCommand = function (wrd,n) {
         this.grab[wrd] = n;
 
     }
-    
+
     this.next = function () {
         
         var token = this.tk.next();
@@ -351,18 +397,6 @@ function Tokenizer () {
     this.load = function (text) {
         this.text = text;
     }
-
-
-    var norm = new Array();
-        norm['pu'] = 'penup';
-        norm['pd'] = 'pendown';
-        norm['fw'] = 'forward';
-        norm['bw'] = 'backward';
-        norm['cs'] = 'clear';
-        norm['rt'] = 'right';
-        norm['lt'] = 'left';
-
-    this.norm = norm;
     
     this.wrd_rx = /^\s*([a-zA-Z]\w*|\[|\])\s*/i;
     this.var_rx = /^\s*:([a-zA-Z]\w*)\s*/i;
@@ -378,9 +412,6 @@ function Tokenizer () {
 
         } else if ((result = this.wrd_rx.exec(this.text)) != null) {
             this.text = this.text.substring(result[0].length)
-            if (this.norm[result[1]] != null) {
-                result[1] = this.norm[result[1]]
-            }
             return new Token('wrd',result[1]);
 
         } else if ((result = this.var_rx.exec(this.text)) != null) {

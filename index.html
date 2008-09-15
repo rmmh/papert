@@ -32,7 +32,8 @@ function init (canvas_id,form_id,oldcode_id) {
     oldcode.style.height = "300px";
     
     turtle = new Turtle(canvas);
-    logo = new Logo(turtle);
+    logo = new Logo()
+    logo.setTurtle(turtle);
 }
 function run () {
         var code = form.code.value;
