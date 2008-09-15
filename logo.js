@@ -412,7 +412,7 @@ function Parser () {
                     
                     if (i == null) return new Token('error','I don\'t know how to tokenize this');
                     if (i.type == "error") return i;
-                    if (i.type == "eof") return new Token('error','You can\'t have an endless to');
+                    if (i.type == "eof") return new Token('error','to '+name+' needs an end');
                  
                     if (i.type !="var") break;
                     
@@ -429,8 +429,8 @@ function Parser () {
                     
                     if (i == null) return new Token('error','I don\'t know how to tokenize this');
                     if (i.type == "error") return i;
-                    if (i.type == "eof") return new Token('error','You can\'t have an endless to');
-                 
+                    if (i.type == "eof") return new Token('error','to '+name+' needs an end');
+                    
                     if (i.type == "wrd" && i.data == 'end') break;
                     
                     code.push(i);
