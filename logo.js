@@ -447,7 +447,7 @@ function Parser () {
 
                 //alert(token);
             
-            } else if (token.data == '[') {
+            } else if (token.data == '(') {
             
                 var args = new Array();
                 do {
@@ -455,7 +455,32 @@ function Parser () {
                     
                     if (i == null) return new Token('error','I don\'t know how to tokenize this');
                     if (i.type == "error") return i;
-                    if (i.type == "eof") return new Token('error','Lists have a start "[", middle and and end "]". Yours does not have an end');
+                    if (i.type == "eof") return new Token('error','You\'re missing a )');
+                 
+                    if (i.type == "wrd" && i.data == ')') break;
+                    
+                    args.push(i);
+                } while (1);
+                //alert("end of list");
+                if (args.length == 1) {
+                    token = args[0];
+                } else{
+                    token.type = "lst";
+                    token.data
+                    token.args = args;
+                } 
+                //alert(token);
+            
+            } else if (token.data == '[') {
+            
+                var args = new Array();
+                do {
+                
+                    var i = this.next();
+                    
+                    if (i == null) return new Token('error','I don\'t know how to tokenize this');
+                    if (i.type == "error") return i;
+                    if (i.type == "eof") return new Token('error','You\'re missing a ]');
                  
                     if (i.type == "wrd" && i.data == ']') break;
                     
@@ -489,7 +514,7 @@ function Parser () {
                  }
             }
         }
-        while (1) {
+        if (token.data != ']' && token.data != ')' ) while (1) {
             var look = this.tk.peek()
             //alert("lookahead = "+look+" " +this.infix[look] ) ;
             if (this.infix[look.data] && this.infix[look.data] < precedent) {
@@ -537,7 +562,7 @@ function Tokenizer () {
     
     this.cache = new Array()
     
-    this.wrd_rx = /^\s*(\+|\-|\*|\/|\%|\<|\>|\=|[a-zA-Z]\w*\??|\[|\])\s*/i;
+    this.wrd_rx = /^\s*(\+|\-|\*|\/|\%|\<|\>|\=|[a-zA-Z]\w*\??|\[|\]|\(|\))\s*/i;
     this.var_rx = /^\s*:([a-zA-Z]\w*)\s*/i;
     this.num_rx = /^\s*(\d+(?:\.\d+)?)\s*/i;
     this.sym_rx = /^\s*"([a-zA-Z]\w*)\s*/i;
