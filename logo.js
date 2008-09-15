@@ -514,10 +514,10 @@ function Parser () {
                  }
             }
         }
-        if (token.data != ']' && token.data != ')' ) while (1) {
+        if (token.data != ']' && token.data != ')' && token.data != 'end' ) while (1) {
             var look = this.tk.peek()
             //alert("lookahead = "+look+" " +this.infix[look] ) ;
-            if (this.infix[look.data] && this.infix[look.data] < precedent) {
+            if (look && this.infix[look.data] && this.infix[look.data] < precedent) {
                 //alert("whee, an infix op");
                 var op_token = this.tk.next();
                 //alert(op_token);
