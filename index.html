@@ -45,6 +45,9 @@ function run () {
         var out = logo.run(code);
         if (out && out.type == "error") {
             alert(out.data);
+            turtle = new Turtle(canvas);
+            logo = new Logo()
+            logo.setTurtle(turtle);
         }
 }
  
