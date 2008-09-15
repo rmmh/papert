@@ -40,7 +40,12 @@ function Logo () {
         this.primitive[name] = fun
         this.addBuiltin(name, grab,aliases);
     };
-
+    
+    this.addInfix = function(name, fun, p) {
+        this.addAlias(name, fun);
+        this.p.addInfix(name,p);
+    }
+    
     this.addTurtleCommand = function(name, grab, aliases) {
         this.turtle_command[name] = grab;
         this.addBuiltin(name, grab,aliases);
@@ -97,7 +102,13 @@ function Logo () {
         this.addCommand('modulo',2,['mod'],function (a) {return a[0]%a[1]});
         this.addCommand('minus',1,null,function (a) {return -a[0]});
 
-
+        this.addInfix('+','sum',40);
+        this.addInfix('-','difference',40);
+        this.addInfix('*','product',20);
+        this.addInfix('/','product',20);
+        this.addInfix('%','modulo',10);
+        
+        
         this.addCommand('or',2,null,function (a) {return a[0] || a[1]});
         this.addCommand('and',2,null,function (a) {return a[0] && a[1]});
         this.addCommand('not',1,null,function (a) {return !a[0]});
@@ -106,6 +117,10 @@ function Logo () {
         this.addCommand('less?',2,null,function (a) {return a[0] < a[1]});
         this.addCommand('greater?',2,null,function (a) {return a[0] > a[1]});
        
+        this.addInfix('=','equals?',60);
+        this.addInfix('<','less?',60);
+        this.addInfix('>','greater?',60);
+
         this.addConstant('stop','stop');
        
 
@@ -336,6 +351,7 @@ function SymbolTable (par) {
     }
 }
 
+
 function Parser () {
     
     this.tk = null;
@@ -350,8 +366,15 @@ function Parser () {
         this.grab[wrd] = n;
 
     }
+    
+    this.infix = new Array();
+    
+    this.addInfix = function (wrd,p) {
+        this.infix[wrd] = p;
+    }
 
-    this.next = function () {
+    this.next = function (precedent) {
+        if (precedent == null) precedent = 100;
         
         var token = this.tk.next();
 
@@ -466,8 +489,22 @@ function Parser () {
                  }
             }
         }
-        
-        
+        while (1) {
+            var look = this.tk.peek()
+            //alert("lookahead = "+look+" " +this.infix[look] ) ;
+            if (this.infix[look.data] && this.infix[look.data] < precedent) {
+                //alert("whee, an infix op");
+                var op_token = this.tk.next();
+                //alert(op_token);
+                var right = this.next(this.infix[look.data]);
+                //alert(right);
+                op_token.args = new Array(token, right);
+                token = op_token;
+            
+            } else {
+                break;
+            }
+        }
         //alert("returning token "+ token)
         return token;
     }
@@ -498,13 +535,29 @@ function Tokenizer () {
         this.text = text;
     }
     
-    this.wrd_rx = /^\s*([a-zA-Z]\w*\??|\[|\])\s*/i;
+    this.cache = new Array()
+    
+    this.wrd_rx = /^\s*(\+|\-|\*|\/|\%|\<|\>|\=|[a-zA-Z]\w*\??|\[|\])\s*/i;
     this.var_rx = /^\s*:([a-zA-Z]\w*)\s*/i;
     this.num_rx = /^\s*(\d+(?:\.\d+)?)\s*/i;
     this.sym_rx = /^\s*"([a-zA-Z]\w*)\s*/i;
 
     this.empty = /^\s*$/;
+    
+    this.peek = function () {
+        if (this.cache.length > 0) { 
+            return this.cache[0];
+        } else {
+            var token = this.next();
+            this.cache.push(token);
+            return token;
+        }
+        
+    }
     this.next = function () {
+        if (this.cache.length > 0) {
+            return this.cache.shift();
+        }
 
         if (this.empty.exec(this.text)) {
             this.text = null;
