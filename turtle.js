@@ -62,6 +62,23 @@ function Turtle (canvas) {
         }
     }
     
+    this.arc = function (radius, angle) {
+        if (this.pen) {
+            this.c.beginPath();
+            this.c.arc(this.x,this.y, radius, this.radians(), ((this.angle+angle)%360)/180*Math.PI,false);
+            this.c.stroke();
+           
+      }
+    }
+    this.circle = function (radius) {
+        if (this.pen) {
+            this.c.beginPath();
+            this.c.arc(this.x,this.y, radius, 0, 2*Math.PI,false);
+            this.c.stroke();
+           
+      }
+    }
+    
     
     this.forward = function (d) {
         this.c.beginPath();

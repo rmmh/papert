@@ -97,16 +97,28 @@ function Logo () {
             this.turtle.setheading(a[0]);
         });
 
-        this.addCommand('setxy',2,null, function () { 
+        this.addCommand('setxy',2,null, function (a) { 
             if (parseInt(a[0]) != a[0]) return new Token('error','When using setxy, you can only set x to a whole number, not '+a[0])
             if (parseInt(a[1]) != a[1]) return new Token('error','When using setxy, you can only set y to a whole number, not '+a[1])
             this.turtle.setxy(a[0],a[1]);
         });
 
+        this.addCommand('arc',2,null, function (a) { 
+            if (parseInt(a[0]) != a[0]) return new Token('error','When using arc, you can only set the radius to a whole number, not '+a[0])
+            if (parseInt(a[1]) != a[1]) return new Token('error','When using arc, you can only set the angle to a whole number, not '+a[1])
+            this.turtle.arc(a[0],a[1]);
+        });
+        
+        this.addCommand('circle',1,null, function (a) { 
+            if (parseInt(a[0]) != a[0]) return new Token('error','When using circle, you can only set the radius to a whole number, not '+a[0])
+ 
+            this.turtle.circle(a[0]);
+        });
         
 
         this.addTurtleCommand('penup',0,['pu']);
         this.addTurtleCommand('pendown',0,['pd']);
+        this.addTurtleCommand('home',0,null);
         
         this.addTurtleCommand('color',1,['colour']);
         
