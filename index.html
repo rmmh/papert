@@ -33,8 +33,8 @@ function init (canvas_id,form_id,oldcode_id) {
     
     logo = new Logo()
     
-    fast = false;
-    turtle = new DelayTurtle(canvas,1);
+    fast = 10;
+    turtle = new DelayTurtle(canvas,fast);
     logo.setTurtle(turtle);
 
 }
@@ -43,10 +43,11 @@ function run (speed) {
         if (speed != fast) {
             fast = speed;
             var newturtle = null;
-            if (speed) {
+            turtle.stop();
+            if (fast == 0) {
                 newturtle = new Turtle(canvas);
             } else {
-                newturtle = new DelayTurtle(canvas,1);
+                newturtle = new DelayTurtle(canvas,fast);
             }
             logo.setTurtle(newturtle);
             turtle = newturtle;
@@ -96,9 +97,10 @@ spiral 1 100
 
 </textarea></div>
 <div>
-<input type="button" onClick="run(false);" value="run slowly"/>
+<input type="button" onClick="run(50);" value="run and draw very slowly"/>
+<input type="button" onClick="run(10);" value="run and draw slowly"/>
 <input type="button" onClick="stop();" value="stop"/>
-<input type="button" onClick="run(true);" value="run fast"/>
+<input type="button" onClick="run(0);" value="run  and draw fast"/>
 
 
 <input type="reset" value="reset form"/>
