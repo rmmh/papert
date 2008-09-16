@@ -55,15 +55,10 @@ function run (speed) {
 
         oldcode.innerHTML +="\n"+code
         //form.code.value = ""
-        
-        function update() {
-            turtle.paint();
-        }
+
         
         var out = logo.run(code);
-        
-        
-        turtle.paint();
+                
         if (out && out.type == "error") {
             alert(out.data);
             init();

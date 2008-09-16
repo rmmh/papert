@@ -158,7 +158,7 @@ function DelayTurtle (canvas, speed) {
     this.speed = speed
 }
 
-DelayTurtle.prototype.start = function(){this.active = true; this.halt = false; this.pipeline = new Array()};
+DelayTurtle.prototype.start = function(){this.active = true; this.halt = false; this.pipeline = new Array(); this.paint();};
 DelayTurtle.prototype.finish = function(){this.active = false;};
 DelayTurtle.prototype.stop =  function(){this.halt = true;};
 
