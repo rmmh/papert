@@ -64,13 +64,13 @@ function Logo () {
     this.setup = function () {
     
         this.addCommand('forward',1,['fw'], function (a) { 
-            if (parseInt(a[0]) != a[0]) return new Token('error','Can only go forward a whole number, not '+a[0])
-            this.turtle.forward(a[0]);
+            if (parseFloat(a[0]) != a[0]) return new Token('error','Can only go forward a number, not '+a[0])
+            this.turtle.forward(parseInt(a[0]));
         });
         
         this.addCommand('backward',1,['bw'], function (a) { 
-            if (parseInt(a[0]) != a[0]) return new Token('error','Can only go backward a whole number, not '+a[0])
-            this.turtle.backward(a[0]);
+            if (parseFloat(a[0]) != a[0]) return new Token('error','Can only go backward a number, not '+a[0])
+            this.turtle.backward(parseInt(a[0]));
         });
         this.addCommand('right',1,['rt'], function (a) { 
             if (parseFloat(a[0]) != a[0]) return new Token('error','Can only turn right a number of degrees, not '+a[0])
@@ -93,7 +93,7 @@ function Logo () {
         
         this.addCommand('setheading',1,['seth'], function (a) { 
             alert('foo');
-            if (parseInt(a[0]) != a[0]) return new Token('error','Can only set heading to a whole number, not '+a[0])
+            if (parseFloat(a[0]) != a[0]) return new Token('error','Can only set heading to a number, not '+a[0])
             this.turtle.setheading(a[0]);
         });
 
@@ -104,18 +104,17 @@ function Logo () {
         });
 
         this.addCommand('arc',2,null, function (a) { 
-            if (parseInt(a[0]) != a[0]) return new Token('error','When using arc, you can only set the radius to a whole number, not '+a[0])
-            if (parseInt(a[1]) != a[1]) return new Token('error','When using arc, you can only set the angle to a whole number, not '+a[1])
+            if (parseFloat(a[0]) != a[0]) return new Token('error','When using arc, you can only set the radius to a number, not '+a[0])
+            if (parseFloat(a[1]) != a[1]) return new Token('error','When using arc, you can only set the angle to a number, not '+a[1])
             this.turtle.arc(a[0],a[1]);
         });
         
         this.addCommand('circle',1,null, function (a) { 
-            if (parseInt(a[0]) != a[0]) return new Token('error','When using circle, you can only set the radius to a whole number, not '+a[0])
+            if (parseFloat(a[0]) != a[0]) return new Token('error','When using circle, you can only set the radius to a number, not '+a[0])
  
             this.turtle.circle(a[0]);
         });
         
-
         this.addTurtleCommand('penup',0,['pu']);
         this.addTurtleCommand('pendown',0,['pd']);
         this.addTurtleCommand('home',0,null);
@@ -145,7 +144,7 @@ function Logo () {
         this.addInfix('+','sum',40);
         this.addInfix('-','difference',40);
         this.addInfix('*','product',20);
-        this.addInfix('/','product',20);
+        this.addInfix('/','divide',20);
         this.addInfix('%','modulo',10);
         
         
