@@ -1,8 +1,6 @@
 // $Id$
 
 
-    
-
 function Logo () {
     this.turtle = null;
     
@@ -335,11 +333,14 @@ function Logo () {
                 
                 if (last.type == "wrd" && last.data == code.data) {
                      var tail = f.code.pop();
-                     while (1) {
+                     while (1) { // revursive
                         
                         var result = this.eval_list(f.code);
                         
-                        if (result == "stop") { return null;};
+                        if (result == "stop") {
+                            this.values = this.values.par;
+                            return null;
+                        };
                         
                         newvalues = new SymbolTable(this.values.par);
                         
