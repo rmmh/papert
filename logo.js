@@ -321,7 +321,7 @@ function Logo () {
                 var last = f.code[f.code.length-1];
                 var newvalues = new SymbolTable(this.values);
 
-                for (var c = 0; c < code.args.length; c ++ ) {
+                for (var c  in code.args) {
                     var name = f.args[c].data;
                     var value = this.eval(code.args[c]);
                     if (value == null) return new Token('error','Can\'t pass a null to '+code.data);
@@ -343,7 +343,7 @@ function Logo () {
                         
                         newvalues = new SymbolTable(this.values.par);
                         
-                        for (var c = 0; c < code.args.length; c ++ ) {
+                        for (var c in code.args) {
                             var name = f.args[c].data;
                             var value = this.eval(tail.args[c]);
                             if (value == null) return new Token('error','Can\'t pass a null to '+code.data);
@@ -401,6 +401,7 @@ function SymbolTable (par) {
     this.par = par;
     this.table = new Array();
     this.get = function (key) {
+        key = "_"+key;
         var r = this.table[key];
         if (r == null && this.par != null) {
             t = this.par.get(key);
@@ -408,7 +409,10 @@ function SymbolTable (par) {
         return r;
     }
     this.set = function (key,value) {
+        key = "_" + key;
+        //alert(key+":"+value);
         this.table[key] = value;
+        //alert("set!");
     }
 }
 
