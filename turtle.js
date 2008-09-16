@@ -197,3 +197,10 @@ DelayTurtle.prototype.color = function() { this.addCommand(this.turtle.color,arg
 DelayTurtle.prototype.arc = function() { this.addCommand(this.turtle.arc,arguments)};
 DelayTurtle.prototype.circle = function() { this.addCommand(this.turtle.circle,arguments)};
 
+DelayTurtle.prototype.setxy = function() { this.addCommand(this.turtle.setxy,arguments)};
+DelayTurtle.prototype.setx = function() { this.addCommand(this.turtle.setx,arguments)};
+DelayTurtle.prototype.sety = function() { this.addCommand(this.turtle.sety,arguments)};
+
+DelayTurtle.prototype.setheading = function() { this.addCommand(this.turtle.setheading,arguments)};
+
+DelayTurtle.prototype.home = function() { this.addCommand(this.turtle.home,arguments)};
