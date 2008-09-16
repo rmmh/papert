@@ -187,7 +187,7 @@ function Logo () {
         this.addPrimitive('if',2,null,function (args) {
                 if (args && args.length == 2) { 
                     var cond = this.eval(args[0]);
-                    if (cond && cond.type == "error") return limit;
+                    if (cond && cond.type == "error") return cond;
 
                     if (cond) {
                         return this.eval(args[1]);
@@ -203,7 +203,7 @@ function Logo () {
         this.addPrimitive('ifelse',3,null,function (args) {
                 if (args && args.length == 3) { 
                     var cond = this.eval(args[0]);
-                    if (cond && cond.type == "error") return limit;
+                    if (cond && cond.type == "error") return cond;
 
                     if (cond) {
                         return this.eval(args[1]);
