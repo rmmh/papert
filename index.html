@@ -41,6 +41,7 @@ function init (canvas_id,form_id,oldcode_id) {
 
 function run (speed) {
         if (speed != fast) {
+            fast = speed;
             var newturtle = null;
             if (speed) {
                 newturtle = new Turtle(canvas);
