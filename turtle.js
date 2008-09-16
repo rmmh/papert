@@ -1,40 +1,24 @@
 // $Id$
 
-
 function Turtle (canvas) {
  
-    if (!canvas.getContext) {
-        return null;
-    }
-
+    if (canvas && canvas.getContext) {
+        this.wait = 100;
     
-    this.wait = 100;
-
-    this.c = canvas.getContext('2d');
-    
-    this.max_x = canvas.width;
-    this.max_y = canvas.height;
-    
-    this.c.lineCap = "round";
-    
-    this.setup();
-}
-
-
-Turtle.prototype.delay = function (x) {
-    this.wait = x;
-}
-
-Turtle.prototype.sleep = function () {
-    var now = new Date();
-    var exit =  now.getTime() + this.wait;
+        this.c = canvas.getContext('2d');
         
-    while (true) {
-        now = new Date()
-        var c = now.getTime()
-        if (c > exit) break;
+        this.max_x = canvas.width;
+        this.max_y = canvas.height;
+        
+        this.c.lineCap = "round";
+        
+        this.setup();
     }
 }
+
+Turtle.prototype.start = function(){};
+Turtle.prototype.stop = function(){};
+Turtle.prototype.finish = function(){};
 
 Turtle.prototype.setxy = function(x,y) {
     this.x = x;
@@ -154,3 +138,62 @@ Turtle.prototype.setup = function() {
     this.color([0,0,0]);
     this.pen = true;
 }
+
+function DelayCommand (that,fun,args) {
+    this.that = that;
+    this.fun = fun;
+    this.args = args;
+}
+
+DelayCommand.prototype.call = function (that) {
+    return this.fun.apply(this.that,this.args);
+}
+
+
+function DelayTurtle (canvas, speed) {
+    this.turtle = new Turtle(canvas);
+    this.pipeline = null;
+    this.active = false;
+    this.halt = false;
+    this.speed = speed
+}
+
+DelayTurtle.prototype.start = function(){this.active = true; this.halt = false; this.pipeline = new Array()};
+DelayTurtle.prototype.finish = function(){this.active = false;};
+DelayTurtle.prototype.stop =  function(){this.halt = true;};
+
+DelayTurtle.prototype.paint = function() {
+    if (!this.halt) {
+        var redraw = this.active;
+        if (this.pipeline.length > 0) {
+            var fun = this.pipeline.shift();
+            fun.call()
+            redraw = true;
+        } 
+        if (redraw) {
+            var that = this;
+            
+            setTimeout(function(){that.paint.call(that)},this.speed);
+        }
+    }
+}
+
+DelayTurtle.prototype.addCommand = function (fun, args) {
+    this.pipeline.push(new DelayCommand(this.turtle, fun, args));
+}
+
+// There must be a nicer way to do this
+
+DelayTurtle.prototype.forward = function() { this.addCommand(this.turtle.forward,arguments)};
+DelayTurtle.prototype.backward = function() { this.addCommand(this.turtle.backward,arguments)};
+DelayTurtle.prototype.right = function() { this.addCommand(this.turtle.right,arguments)};
+DelayTurtle.prototype.left = function() { this.addCommand(this.turtle.left,arguments)};
+DelayTurtle.prototype.reset = function() { this.addCommand(this.turtle.reset,arguments)};
+DelayTurtle.prototype.clearscreen = function() { this.addCommand(this.turtle.clearscreen,arguments)};
+DelayTurtle.prototype.penup = function() { this.addCommand(this.turtle.penup,arguments)};
+DelayTurtle.prototype.pendown = function() { this.addCommand(this.turtle.pendown,arguments)};
+DelayTurtle.prototype.penwidth = function() { this.addCommand(this.turtle.penwidth,arguments)};
+DelayTurtle.prototype.color = function() { this.addCommand(this.turtle.color,arguments)};
+DelayTurtle.prototype.arc = function() { this.addCommand(this.turtle.arc,arguments)};
+DelayTurtle.prototype.circle = function() { this.addCommand(this.turtle.circle,arguments)};
+

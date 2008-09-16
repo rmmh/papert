@@ -31,27 +31,48 @@ function init (canvas_id,form_id,oldcode_id) {
     oldcode.style.width = "90%";
     oldcode.style.height = "300px";
     
-    turtle = new Turtle(canvas);
     logo = new Logo()
+    
+    fast = false;
+    turtle = new DelayTurtle(canvas,1);
     logo.setTurtle(turtle);
+
 }
-function run () {
+
+function run (speed) {
+        if (speed != fast) {
+            var newturtle = null;
+            if (speed) {
+                newturtle = new Turtle(canvas);
+            } else {
+                newturtle = new DelayTurtle(canvas,1);
+            }
+            logo.setTurtle(newturtle);
+            turtle = newturtle;
+        }
         var code = form.code.value;
 
         oldcode.innerHTML +="\n"+code
         //form.code.value = ""
         
+        function update() {
+            turtle.paint();
+        }
         
         var out = logo.run(code);
+        
+        
+        turtle.paint();
         if (out && out.type == "error") {
             alert(out.data);
-            turtle = new Turtle(canvas);
-            logo = new Logo()
-            logo.setTurtle(turtle);
+            init();
         }
 }
- 
 
+function stop(){
+    turtle.stop();
+}
+    
 </script>
 </head>
 <body onload="init('canvas','form','oldcode');">
@@ -79,7 +100,11 @@ spiral 1 100
 
 </textarea></div>
 <div>
-<input type="button" onClick="run();" value="run"/>
+<input type="button" onClick="run(false);" value="run slowly"/>
+<input type="button" onClick="stop();" value="stop"/>
+<input type="button" onClick="run(true);" value="run fast"/>
+
+
 <input type="reset" value="reset form"/>
 </div>
 </form>

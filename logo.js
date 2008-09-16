@@ -250,23 +250,23 @@ Logo.prototype.run = function (code) {
     
     var i = null;
     
+    this.turtle.start();
+    
+    var ret = null;
     do {
         i = this.p.next();
-        if (i == null) return new Token('error','I can\'t parse this.');
-        if (i.type == "error") return i;
-        if (i.type == "eof") {
-            i = null;
-            break;
-        }
+        if (i == null) { ret =new Token('error','I can\'t parse this.'); break;}
+        if (i.type == "error") {ret = i; break;}
+        if (i.type == "eof") break;
         
         var out = this.eval(i);
-        if (out && out.type == "error") {return out;}
-        
+        if (out && out.type == "error") {ret = out; break;}
         
     } while (1);
     
-    return
-    }
+    this.turtle.finish();
+    return ret;
+}
 
 Logo.prototype.eval = function (code) {
     //alert("evaling "+code.type);
