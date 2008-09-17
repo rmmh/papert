@@ -329,24 +329,27 @@ Logo.prototype.eval = function (code) {
                 if (value == null) return new Token('error','Can\'t pass a null to '+code.data);
                 if (value && value.type == 'error') return value;
 
-                //alert("setting: "+name +":" +value);
+                //alert("call "+code.data+" setting: "+name +":" +value);
                 newvalues.set(name,value);
 
             }
-            this.values = newvalues;
             
             if (last.type == "wrd" && last.data == code.data) {
-                 var tail = f.code.pop();
-                 while (1) { // revursive
-                    
+                
+                var par = this.values;
+                
+                var tail = f.code.pop();
+                while (1) { // revursive
+                    this.values = newvalues;
                     var result = this.eval_list(f.code);
                     
                     if (result == "stop") {
-                        this.values = this.values.par; // restore the original stack
+                        this.values = par; // restore the original stack
+                        f.code.push(tail); // restore the original tail.
                         return null;
                     };
                     
-                    newvalues = new SymbolTable(this.values.par);
+                    newvalues = new SymbolTable(par);
                     
                     for (var c in code.args) {
                         var name = f.args[c].data;
@@ -354,14 +357,15 @@ Logo.prototype.eval = function (code) {
                         if (value == null) return new Token('error','Can\'t pass a null to '+code.data);
                         if (value && value.type == 'error') return value;
     
-                        //alert("setting: "+name +":" +value);
+                        //alert("rec: "+code.data+" setting: "+name +":" +value);
                         newvalues.set(name,value);
     
                     }
-                    
-                    this.values = newvalues;
+            
                 }
             } else {
+                this.values = newvalues;
+         
                 var result = this.eval_list(f.code);
                 
                 if (result == "stop") { result = null };
