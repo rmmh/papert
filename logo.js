@@ -126,7 +126,7 @@ Logo.prototype.setup = function () {
     });
     
     this.addCommand('penwidth',1,null, function (a) { 
-        if (parseInt(a[0]) != a[0]) return new Token('error','Pen widths can only be a whole number, not '+a[0])
+        if (parseFloat(a[0]) != a[0]) return new Token('error','Pen widths can only be a number, not '+a[0])
         this.turtle.penwidth(a[0]);
     });
     
