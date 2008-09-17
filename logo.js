@@ -141,6 +141,8 @@ Logo.prototype.setup = function () {
     this.addCommand('modulo',2,['mod'],function (a) {return a[0]%a[1]});
     this.addCommand('minus',1,null,function (a) {return -a[0]});
 
+    this.addCommand('output',1,['op'],function (a) {return a[0]});
+
     this.addInfix('+','sum',40);
     this.addInfix('-','difference',40);
     this.addInfix('*','product',20);
@@ -406,17 +408,19 @@ function SymbolTable (par) {
 }
 
 SymbolTable.prototype.get = function (key) {
-    key = "_"+key;
-    var r = this.table[key];
+    var mkey = "_"+key;
+    var r = this.table[mkey];
     if (r == null && this.par != null) {
         t = this.par.get(key);
     }
     return r;
 }
+
+
 SymbolTable.prototype.set = function (key,value) {
-    key = "_" + key;
+    var mkey = "_" + key;
     //alert(key+":"+value);
-    this.table[key] = value;
+    this.table[mkey] = value;
     //alert("set!");
 }
 
@@ -628,7 +632,7 @@ function Token(type,data) {
 }
 
 Token.prototype.toString = function () {
-        return "(" + type + ")" + data ;
+        return "(" + this.type + ")" + this.data ;
 }
 
 
