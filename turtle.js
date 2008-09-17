@@ -53,6 +53,17 @@ Turtle.prototype.arc = function (radius, angle) {
        
   }
 }
+Turtle.prototype.arc_point = function (radius, angle) {
+    if (this.pen) {
+        this.c.beginPath();
+        this.c.arc(this.x,this.y, radius, ((this.angle+angle)%360)/180*Math.PI, ((this.angle+angle+1)%360)/180*Math.PI,false);
+        this.c.stroke();
+       
+  }
+}
+
+
+
 Turtle.prototype.circle = function (radius) {
     if (this.pen) {
         this.c.beginPath();
@@ -184,8 +195,15 @@ DelayTurtle.prototype.addCommand = function (fun, args) {
 
 // There must be a nicer way to do this
 
-DelayTurtle.prototype.forward = function() { this.addCommand(this.turtle.forward,arguments)};
-DelayTurtle.prototype.backward = function() { this.addCommand(this.turtle.backward,arguments)};
+DelayTurtle.prototype.forward = function(d) {
+    var l = Math.abs(d);
+    var s = l/d; 
+    for (var c = 0; c < l; c++ ) {
+        this.addCommand(this.turtle.forward,[s])
+    }
+};
+DelayTurtle.prototype.backward = function(d) { this.forward(-d)};
+
 DelayTurtle.prototype.right = function() { this.addCommand(this.turtle.right,arguments)};
 DelayTurtle.prototype.left = function() { this.addCommand(this.turtle.left,arguments)};
 DelayTurtle.prototype.reset = function() { this.addCommand(this.turtle.reset,arguments)};
@@ -194,8 +212,18 @@ DelayTurtle.prototype.penup = function() { this.addCommand(this.turtle.penup,arg
 DelayTurtle.prototype.pendown = function() { this.addCommand(this.turtle.pendown,arguments)};
 DelayTurtle.prototype.penwidth = function() { this.addCommand(this.turtle.penwidth,arguments)};
 DelayTurtle.prototype.color = function() { this.addCommand(this.turtle.color,arguments)};
-DelayTurtle.prototype.arc = function() { this.addCommand(this.turtle.arc,arguments)};
-DelayTurtle.prototype.circle = function() { this.addCommand(this.turtle.circle,arguments)};
+
+DelayTurtle.prototype.arc = function(radius, angle) { 
+    var end = (360+angle) % 360 ; 
+    for (var c = 0; c <= end; c++ ) {
+        this.addCommand(this.turtle.arc_point,[radius,c])
+    }
+};
+DelayTurtle.prototype.circle = function(radius) {
+    for (var c = 0; c < 360; c++ ) {
+        this.addCommand(this.turtle.arc_point,[radius,c])
+    }
+};
 
 DelayTurtle.prototype.setxy = function() { this.addCommand(this.turtle.setxy,arguments)};
 DelayTurtle.prototype.setx = function() { this.addCommand(this.turtle.setx,arguments)};
