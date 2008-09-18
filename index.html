@@ -41,6 +41,30 @@ function setup () {
     logo.setTurtle(turtle);
 }
 
+function koch() {
+    form.code.value ='\
+to line :count :length\n\
+ifelse :count = 1 [fw :length] [\n\
+make "count :count -1 \n\
+line :count :length\n\
+lt 60 line :count :length\n\
+rt 120 line :count :length\n\
+lt 60 line :count :length]\n\
+end\n\
+\n\
+to koch :count :length\n\
+rt 30 line :count :length\n\
+rt 120 line :count :length\n\
+rt 120 line :count :length\n\
+end\n\
+\n\
+reset\n\
+setxy  10 400\n\
+koch 5 4\n\
+';}
+
+
+
 function run (speed) {
         if (speed != fast) {
             fast = speed;
@@ -209,18 +233,6 @@ Note: Simple Tail recursion is supported.
     <div id="oldcode">&nbsp;</div>
     <div>
     <textarea id="code">
-    to spiral :co :lm
-    forward :co
-    right 30
-    color [0  2 * :co 255 - :co]
-    penwidth :co % 10
-    make "co :co + 1
-    ifelse :co &lt; :lm [spiral :co :lm] [stop]
-    end
-    
-    reset
-    spiral 1 100
-    
     </textarea>
     </div>
     <div>
@@ -230,7 +242,7 @@ Note: Simple Tail recursion is supported.
     <input type="button" onClick="run(0);" value="run  and draw fast"/>
     
     
-    <input type="reset" value="reset form"/>
+    <input type="button" value="koch example" onClick="koch()"/>
     </div>
     </form>
 </div>
