@@ -141,7 +141,7 @@ Logo.prototype.setup = function () {
     this.addCommand('modulo',2,['mod'],function (a) {return a[0]%a[1]});
     this.addCommand('minus',1,null,function (a) {return -a[0]});
 
-    this.addCommand('output',1,['op'],function (a) {return a[0]});
+    this.addCommand('output',1,['op'],function (a) {return new Token('stop',a[0])});
 
     this.addInfix('+','sum',40);
     this.addInfix('-','difference',40);
@@ -167,7 +167,7 @@ Logo.prototype.setup = function () {
     this.addInfix('<=','lessequal?',60);
     this.addInfix('>=','greaterequal?',60);
 
-    this.addConstant('stop','stop');
+    this.addConstant('stop',new Token('stop',null));
    
 
     this.addPrimitive('repeat',2,null,function (args) {
@@ -181,7 +181,7 @@ Logo.prototype.setup = function () {
                 for (var c = 0; c< limit; c++) {
                     var res = this.eval(cmd);
                     if (res && res.type == "error") return res;
-                    if (res == "stop") return null;
+                    if (res && res.type == "stop") return res;
                 }
             } else {
                 return new Token ('error','I can\'t repeat.');
@@ -348,10 +348,10 @@ Logo.prototype.eval = function (code) {
                     this.values = newvalues;
                     var result = this.eval_list(f.code);
                     
-                    if (result == "stop") {
+                    if (result && result.type == "stop") {
                         this.values = par; // restore the original stack
                         f.code.push(tail); // restore the original tail.
-                        return null;
+                        return result.data;
                     };
                     
                     newvalues = new SymbolTable(par);
@@ -373,7 +373,7 @@ Logo.prototype.eval = function (code) {
          
                 var result = this.eval_list(f.code);
                 
-                if (result == "stop") { result = null };
+                if (result && result.type == "stop") { result = result.data };
 
                 this.values = this.values.par;
                 return result
@@ -401,8 +401,8 @@ Logo.prototype.eval_list = function(args) {
         var res = this.eval(args[i]);
         if (res && res.type == "error") {
             return res;
-        } else if (res == "stop") {
-            return "stop";
+        } else if (res  && res.type== "stop") {
+            return res
         } else {
             ret.push(res);
         }
