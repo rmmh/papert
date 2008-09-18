@@ -79,38 +79,161 @@ function stop(){
 <canvas id="canvas" width="500" height="500">
 Is broken
 </canvas>
+<pre>
+Types:
+
+WORDS:          FW BW ....
+NUMBERS:        0, 0.1, 20
+LISTS:          [1 2 3 5]
+SYMBOLS:        "foo "bar
+VARIABLES:      :foo :bar 
+
+
+Supported Commands:
+
+RESET           Clear the screen, move home.
+
+
+Turtle Movement:
+
+FORWARD n       Move the turtle forward n pixels
+FW n    
+
+BACKWARD n      Move the turtle backward n pixels
+
+RIGHT n         Move the turtle left or right n degrees
+RT n
+LEFT n
+LT n
+
+SETX x          Set the co-ordinates of the turtle
+SETY y
+SETXY x y
+
+HOME            Move the turtle to the home position
+
+
+Drawing:
+
+CLEARSCREEN     Clear the screen
+CLEAR
+CS
+
+CIRCLE r        Draw a Circle of radius r around the turtle
+
+ARC r d         Draw an arc of radius r for d degrees
+
+PENUP           Lift the pen up and down
+PU
+PENDOWN
+PD
+
+COLOR [r g b]   Set the pen color
+
+PENWIDTH w      Set the pen width
+
+
+Arithmetic:
+
+1 + 2                   1 * 2
+SUM 1 2                 PRODUCT 1 2
+(SUM 1 2 3 ...)         (PRODUCT 1 2 3 ...)
+
+1 - 2                   1 / 2
+DIFFERENCE 1 2          DIVIDE 1 2
+
+1 % 2
+MOD 1 2
+
+Logical and Comparison:
+
+1 = 1
+EQUAL? 1 1
+EQUALP 1 1
+
+1 &lt; 2                1 &lt;= 2
+LESS? 1 2               LESSEQUAL? 1 2
+LESSP 1 2               LESSEQUALP 1 2
+
+2 &gt; 1                2 &gt; 1
+GREATER? 2 1            GREATEREQUAL? 2 1
+GREATERP 2 1            GREATEREQUALP 2 1
+
+AND TRUE FALSE          OR FALSE TRUE
+
+Conditionals:
+
+IF COND [IF_TRUE] 
+IF 2 > 1 [FW 100]
+
+IFELSE COND [IF_TRUE] [IF_FALSE]
+IFELSE 2 > 1 [FW 100 RT 90] [BW 100 LT 90]
+
+
+Setting and getting:
+
+Set x to 1:             make "x 1
+Adding :n to :x         :n + :x
+Setting :x to :n + :x   make "x :x + :n
+
+Looping:
+
+REPEAT n [COMMANDS ...]
+
+STOP    - Stop the current Repeat or function.
+
+
+Defining and Calling:
+
+TO FOO :ARG1 :ARG2 BODY END
+
+TO SQUARE :length 
+REPEAT 4 [FW :length RT 90]
+END
+
+SQUARE :10
+
+TO POLYGON :length :sides
+REPEAT :sides [FW :length RT 360/:sides]
+END
+
+POLYGON 5 10
+
+Note: Simple Tail recursion is supported.
+
+
+</pre>
 </div>
 <div class="right column">
-<form id="form" onSubmit="run(); return false;" action="#">
-<div id="oldcode">&nbsp;</div>
-<div>
-<textarea id="code">
-to spiral :co :lm
-forward :co
-right 30
-color [0  2 * :co 255 - :co]
-penwidth :co % 10
-make "co :co + 1
-ifelse :co &lt; :lm [spiral :co :lm] [stop]
-end
-
-reset
-spiral 1 100
-
-</textarea></div>
-<div>
-<input type="button" onClick="run(25);" value="run and draw very slowly"/>
-<input type="button" onClick="run(5);" value="run and draw slowly"/>
-<input type="button" onClick="stop();" value="stop"/>
-<input type="button" onClick="run(0);" value="run  and draw fast"/>
-
-
-<input type="reset" value="reset form"/>
+    <form id="form" onSubmit="run(); return false;" action="#">
+    <div id="oldcode">&nbsp;</div>
+    <div>
+    <textarea id="code">
+    to spiral :co :lm
+    forward :co
+    right 30
+    color [0  2 * :co 255 - :co]
+    penwidth :co % 10
+    make "co :co + 1
+    ifelse :co &lt; :lm [spiral :co :lm] [stop]
+    end
+    
+    reset
+    spiral 1 100
+    
+    </textarea>
+    </div>
+    <div>
+    <input type="button" onClick="run(25);" value="run and draw very slowly"/>
+    <input type="button" onClick="run(5);" value="run and draw slowly"/>
+    <input type="button" onClick="stop();" value="stop"/>
+    <input type="button" onClick="run(0);" value="run  and draw fast"/>
+    
+    
+    <input type="reset" value="reset form"/>
+    </div>
+    </form>
 </div>
-</form>
-</div>
-
-<p> Supported: forward n (fw), backward n (bw), right n (rt), left n (lt), penup (pu), pendown (pd), clear (cs), reset, repeat n [commands], to name :args commands end. color [ r g b], penwidth n, greater? a b, less? a b and? a b, or? a b, and so on. I will put a proper list here soon.</p>
 
 <a href="http://code.google.com/p/papert">papert on google code</a>
 

@@ -154,13 +154,18 @@ Logo.prototype.setup = function () {
     this.addCommand('and',2,null,function (a) {return a[0] && a[1]});
     this.addCommand('not',1,null,function (a) {return !a[0]});
 
-    this.addCommand('equals?',2,null,function (a) {return a[0] == a[1]});
-    this.addCommand('less?',2,null,function (a) {return a[0] < a[1]});
-    this.addCommand('greater?',2,null,function (a) {return a[0] > a[1]});
-   
-    this.addInfix('=','equals?',60);
+    this.addCommand('equal?',2,['equalp'],function (a) {return a[0] == a[1]});
+    this.addCommand('less?',2,['lessp'],function (a) {return a[0] < a[1]});
+    this.addCommand('greater?',2,['greaterp'],function (a) {return a[0] > a[1]});
+
+    this.addCommand('greaterequal?',2,['greaterequalp'],function (a) {return a[0] >= a[1]});
+    this.addCommand('lessequal?',2,['greaterequalp'],function (a) {return a[0] <= a[1]});
+
+    this.addInfix('=','equal?',60);
     this.addInfix('<','less?',60);
     this.addInfix('>','greater?',60);
+    this.addInfix('<=','lessequal?',60);
+    this.addInfix('>=','greaterequal?',60);
 
     this.addConstant('stop','stop');
    
@@ -652,7 +657,7 @@ Tokenizer.prototype.load = function (text) {
 }
 
  
-Tokenizer.prototype.ops_rx = /^\s*(\+|\-|\*|\/|\%|\<|\>|\=|\[|\]|\(|\)|to|end)\s*/i;
+Tokenizer.prototype.ops_rx = /^\s*(<=|>=|\+|\-|\*|\/|\%|<|>|=|\[|\]|\(|\)|to|end)\s*/i;
 Tokenizer.prototype.wrd_rx = /^\s*([a-zA-Z]\w*\??)\s*/i;
 Tokenizer.prototype.var_rx = /^\s*:([a-zA-Z]\w*)\s*/i;
 Tokenizer.prototype.num_rx = /^\s*(\d+(?:\.\d+)?)\s*/i;
