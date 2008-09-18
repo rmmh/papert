@@ -11,6 +11,9 @@ canvas { border:1px solid black;}
 </style>
 <script src="turtle.js"></script>
 <script src="logo.js"></script>
+<script src="third/base64.js"></script>
+<script src="third/canvas2image.js"></script>
+
 <script>
 
 var turtle = null;
@@ -100,9 +103,11 @@ function stop(){
 </head>
 <body onload="init('canvas','form','oldcode');">
 <div class="left column">
-<canvas id="canvas" width="500" height="500">
+<p><canvas id="canvas" width="500" height="500">
 Is broken
 </canvas>
+</p>
+<input type="button" onClick="Canvas2Image.saveAsPNG(canvas)" value="save as png"> 
 <pre>
 Types:
 
