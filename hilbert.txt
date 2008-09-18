@@ -1,0 +1,38 @@
+to r :l :w end
+
+to l :l :w
+color [255 0 0] 
+if :l = 0 [stop]
+rt 90
+r :l -1 :w
+fw :w
+lt 90
+l :l -1 :w
+fw :w
+l :l-1 :w
+lt 90
+fw :w
+r :l -1 :w
+rt 90
+end
+
+to r :l :w
+color [0 0 255]
+if :l = 0 [stop]
+lt 90
+l :l -1 :w
+fw :w
+rt 90
+r :l -1 :w
+fw :w
+r :l -1 :w
+right 90
+fw :w
+l :l -1 :w
+lt 90
+end
+
+reset
+setxy 10 490
+penwidth 4
+l 6 6
