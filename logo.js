@@ -68,7 +68,7 @@ Logo.prototype.setup = function () {
         this.turtle.forward(parseInt(a[0]));
     });
     
-    this.addCommand('backward',1,['bw','bk'], function (a) { 
+    this.addCommand('backward',1,['bw','bk','back'], function (a) { 
         if (parseFloat(a[0]) != a[0]) return new Token('error','Can only go backward a number, not '+a[0])
         this.turtle.backward(parseInt(a[0]));
     });
@@ -103,6 +103,17 @@ Logo.prototype.setup = function () {
         this.turtle.setxy(a[0],a[1]);
     });
 
+    this.addCommand('setpos',1,null, function (b) { 
+        if (b && b.length == 1 && b[0].length == 2 ) {
+            var a = b[0];
+            if (parseInt(a[0]) != a[0]) return new Token('error','When using setpos, you can only set x to a whole number, not '+a[0])
+            if (parseInt(a[1]) != a[1]) return new Token('error','When using setpos, you can only set y to a whole number, not '+a[1])
+            this.turtle.setxy(a[0],a[1]);
+        } else {
+            return new Token('error','You need to pass setpos a list of two arguments [ x y ], not '+b[0]);
+        }
+    });
+
     this.addCommand('arc',2,null, function (a) { 
         if (parseFloat(a[0]) != a[0]) return new Token('error','When using arc, you can only set the radius to a number, not '+a[0])
         if (parseFloat(a[1]) != a[1]) return new Token('error','When using arc, you can only set the angle to a number, not '+a[1])
@@ -125,7 +136,7 @@ Logo.prototype.setup = function () {
         this.turtle.color(a[0]);
     });
     
-    this.addCommand('penwidth',1,null, function (a) { 
+    this.addCommand('penwidth',1,['setpensize'], function (a) { 
         if (parseFloat(a[0]) != a[0]) return new Token('error','Pen widths can only be a number, not '+a[0])
         this.turtle.penwidth(a[0]);
     });
@@ -133,12 +144,25 @@ Logo.prototype.setup = function () {
     this.addTurtleCommand('clearscreen',0,['cs','clear']);
     
     this.addTurtleCommand('reset',0,null);
+
+
+    this.addCommand('int',1,null,function (a) {return Math.floor(a[0])});
+    this.addCommand('round',1,null,function (a) {return Math.round(a[0])});
+    this.addCommand('sqrt',1,null,function (a) {return Math.sqrt(a[0])});
+    this.addCommand('power',2,['pow'],function (a) {return Math.pow(a[0],a[1])});
+    this.addCommand('exp',1,null,function (a) {return Math.exp(a[0])});
+    this.addCommand('ln',1,null,function (a) {return Math.log(a[0])});
+    this.addCommand('log10',1,null,function (a) {return Math.LOG10E * Math.log(a[0])});
+    this.addCommand('sin',1,null,function (a) {return Math.sin(a[0]/180*Math.PI)});
+    this.addCommand('cos',1,null,function (a) {return Math.cos(a[0]/180*Math.PI)});
+    this.addCommand('radsin',1,null,function (a) {return Math.sin(a[0])});
+    this.addCommand('radcos',1,null,function (a) {return Math.cos(a[0])});
     
     this.addCommand('sum',2,['add'],function (a) {var sum = 0; for (var i in a) {sum+=a[i]}; return sum;});
     this.addCommand('difference',2,['sub'],function (a) {return a[0]-a[1]});
     this.addCommand('product',2,['mul'],function (a) {var product = 1; for (var i in a) {product*=a[i]}; return product;});
     this.addCommand('divide',2,['div'],function (a) {return a[0]/a[1]});
-    this.addCommand('modulo',2,['mod'],function (a) {return a[0]%a[1]});
+    this.addCommand('modulo',2,['mod','remainder'],function (a) {return a[0]%a[1]});
     this.addCommand('minus',1,null,function (a) {return -a[0]});
 
     this.addCommand('output',1,['op'],function (a) {return new Token('stop',a[0])});
@@ -155,6 +179,7 @@ Logo.prototype.setup = function () {
     this.addCommand('not',1,null,function (a) {return !a[0]});
 
     this.addCommand('equal?',2,['equalp'],function (a) {return a[0] == a[1]});
+    this.addCommand('notequal?',2,['notequalp'],function (a) {return a[0] != a[1]});
     this.addCommand('less?',2,['lessp'],function (a) {return a[0] < a[1]});
     this.addCommand('greater?',2,['greaterp'],function (a) {return a[0] > a[1]});
 
@@ -162,6 +187,8 @@ Logo.prototype.setup = function () {
     this.addCommand('lessequal?',2,['greaterequalp'],function (a) {return a[0] <= a[1]});
 
     this.addInfix('=','equal?',60);
+    this.addInfix('!=','notequal?',60);
+    this.addInfix('<>','notequal?',60);
     this.addInfix('<','less?',60);
     this.addInfix('>','greater?',60);
     this.addInfix('<=','lessequal?',60);
@@ -169,6 +196,100 @@ Logo.prototype.setup = function () {
 
     this.addConstant('stop',new Token('stop',null));
    
+    this.addPrimitive('forever',1,null,function (args) {
+            if (args && args.length == 1) { 
+                var cmd = args[0];
+                while(true) { 
+                    var res = this.eval(cmd);
+                    if (res && res.type == "error") return res;
+                    if (res && res.type == "stop") return res;
+                }
+            } else {
+                return new Token ('error','I can\'t forever.');
+            }
+        
+        }
+    );
+
+    this.addPrimitive('do.until',2,null,function (args) {
+            if (args && args.length == 2) { 
+                var cmd = args[1];
+                while (true) {
+                    var res = this.eval(cmd);
+                    if (res && res.type == "error") return res;
+                    if (res && res.type == "stop") return res;
+
+                    var limit = this.eval(args[0]);
+                    if (limit == null) return new Token('error','Don\'t know what the while condition is.');
+                    if (limit && limit.type == "error") return limit;
+                    if (limit) return;
+                }
+            } else {
+                return new Token ('error','I can\'t repeat.');
+            }
+        
+        }
+    );
+
+
+    this.addPrimitive('do.while',2,null,function (args) {
+            if (args && args.length == 2) { 
+                var cmd = args[1];
+                while (true) {
+                    var res = this.eval(cmd);
+                    if (res && res.type == "error") return res;
+                    if (res && res.type == "stop") return res;
+
+                    var limit = this.eval(args[0]);
+                    if (limit == null) return new Token('error','Don\'t know what the while condition is.');
+                    if (limit && limit.type == "error") return limit;
+                    if (!limit) return;
+                }
+            } else {
+                return new Token ('error','I can\'t repeat.');
+            }
+        
+        }
+    );
+
+    this.addPrimitive('until',2,null,function (args) {
+            if (args && args.length == 2) { 
+                var cmd = args[1];
+                while (true) {
+                    var limit = this.eval(args[0]);
+                    if (limit == null) return new Token('error','Don\'t know what the while condition is.');
+                    if (limit && limit.type == "error") return limit;
+                    if (limit) return;
+                
+                    var res = this.eval(cmd);
+                    if (res && res.type == "error") return res;
+                    if (res && res.type == "stop") return res;
+                }
+            } else {
+                return new Token ('error','I can\'t repeat.');
+            }
+        
+        }
+    );
+    this.addPrimitive('while',2,null,function (args) {
+            if (args && args.length == 2) { 
+                var cmd = args[1];
+                while (true) {
+                    var limit = this.eval(args[0]);
+                    if (limit == null) return new Token('error','Don\'t know what the while condition is.');
+                    if (limit && limit.type == "error") return limit;
+                    if (!limit) return;
+                
+                    var res = this.eval(cmd);
+                    if (res && res.type == "error") return res;
+                    if (res && res.type == "stop") return res;
+                }
+            } else {
+                return new Token ('error','I can\'t repeat.');
+            }
+        
+        }
+    );
 
     this.addPrimitive('repeat',2,null,function (args) {
             if (args && args.length == 2) { 
@@ -194,6 +315,7 @@ Logo.prototype.setup = function () {
             if (args && args.length == 2) { 
                 var cond = this.eval(args[0]);
                 if (cond && cond.type == "error") return cond;
+                if (cond == null) return new Token('error','if needs a condition, something that is true or false. what is being run is returning null');
 
                 if (cond) {
                     return this.eval(args[1]);
@@ -210,6 +332,7 @@ Logo.prototype.setup = function () {
             if (args && args.length == 3) { 
                 var cond = this.eval(args[0]);
                 if (cond && cond.type == "error") return cond;
+                if (cond == null) return new Token('error','if needs a condition, something that is true or false. what is being run is returning null');
 
                 if (cond) {
                     return this.eval(args[1]);
@@ -543,7 +666,7 @@ Parser.prototype.next = function (precedent) {
             
             var i = null;
             do {
-                i = this.next();
+                i = this.tk.peek();
                 
                 if (i == null) return new Token('error','I don\'t know how to tokenize this');
                 if (i.type == "error") return i;
@@ -551,7 +674,7 @@ Parser.prototype.next = function (precedent) {
              
                 if (i.type !="var") break;
                 
-                args.push(i);
+                args.push(this.tk.next());
                 this.addCommand(name, args.length);
                 
             } while (1);
@@ -562,15 +685,16 @@ Parser.prototype.next = function (precedent) {
             
             do {
                 
+                i = this.next();
                 if (i == null) return new Token('error','I don\'t know how to tokenize this');
                 if (i.type == "error") return i;
                 if (i.type == "eof") return new Token('error','to '+name+' needs an end');
                 
+                if (i.type == "ops" && i.data == 'to') return new Token('error','I\'m sorry, you can\'t have nested to\'s');
                 if (i.type == "ops" && i.data == 'end') break;
                 
                 code.push(i);
                 
-                i = this.next();
             } while (1);
             
             //alert("end of list");
@@ -657,8 +781,8 @@ Tokenizer.prototype.load = function (text) {
 }
 
  
-Tokenizer.prototype.ops_rx = /^\s*(<=|>=|\+|\-|\*|\/|\%|<|>|=|\[|\]|\(|\)|to|end)\s*/i;
-Tokenizer.prototype.wrd_rx = /^\s*([a-zA-Z]\w*\??)\s*/i;
+Tokenizer.prototype.ops_rx = /^\s*(!=|<>|<=|>=|\+|\-|\*|\/|\%|<|>|=|\[|\]|\(|\)|to|end)\s*/i;
+Tokenizer.prototype.wrd_rx = /^\s*([a-zA-Z\.]\w*\??)\s*/i;
 Tokenizer.prototype.var_rx = /^\s*:([a-zA-Z]\w*)\s*/i;
 Tokenizer.prototype.num_rx = /^\s*(\d+(?:\.\d+)?)\s*/i;
 Tokenizer.prototype.sym_rx = /^\s*"([a-zA-Z]\w*)\s*/i;
