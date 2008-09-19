@@ -68,7 +68,7 @@ Logo.prototype.setup = function () {
         this.turtle.forward(parseInt(a[0]));
     });
     
-    this.addCommand('backward',1,['bw'], function (a) { 
+    this.addCommand('backward',1,['bw','bk'], function (a) { 
         if (parseFloat(a[0]) != a[0]) return new Token('error','Can only go backward a number, not '+a[0])
         this.turtle.backward(parseInt(a[0]));
     });
