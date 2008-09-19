@@ -63,7 +63,7 @@ Logo.prototype.addBuiltin = function(name,grab,aliases) {
 
 Logo.prototype.setup = function () {
 
-    this.addCommand('forward',1,['fw'], function (a) { 
+    this.addCommand('forward',1,['fw','fd'], function (a) { 
         if (parseFloat(a[0]) != a[0]) return new Token('error','Can only go forward a number, not '+a[0])
         this.turtle.forward(parseInt(a[0]));
     });
@@ -685,15 +685,15 @@ Tokenizer.prototype.next = function () {
         return new Token('eof','');
     } else if ((result = this.ops_rx.exec(this.text)) != null) {
         this.text = this.text.substring(result[0].length)
-        return new Token('ops',result[1]);
+        return new Token('ops',result[1].toLowerCase());
 
     } else if ((result = this.wrd_rx.exec(this.text)) != null) {
         this.text = this.text.substring(result[0].length)
-        return new Token('wrd',result[1]);
+        return new Token('wrd',result[1].toLowerCase());
 
     } else if ((result = this.var_rx.exec(this.text)) != null) {
         this.text = this.text.substring(result[0].length)
-        return new Token('var',result[1]);
+        return new Token('var',result[1].toLowerCase());
 
     } else if ((result = this.num_rx.exec(this.text)) != null) {
         this.text = this.text.substring(result[0].length)
@@ -701,7 +701,7 @@ Tokenizer.prototype.next = function () {
 
     } else if ((result = this.sym_rx.exec(this.text)) != null) {
         this.text = this.text.substring(result[0].length)
-        return new Token('sym',result[1]);
+        return new Token('sym',result[1].toLowerCase());
 
     } else {
         return new Token('error', 'I can\'t understand this:'+this.text);
