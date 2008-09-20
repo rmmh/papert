@@ -159,6 +159,8 @@ Logo.prototype.setup = function () {
     this.addCommand('cos',1,null,function (a) {return Math.cos(a[0]/180*Math.PI)});
     this.addCommand('radsin',1,null,function (a) {return Math.sin(a[0])});
     this.addCommand('radcos',1,null,function (a) {return Math.cos(a[0])});
+
+    this.addCommand('random',1,['rand'],function (a) {return Math.floor(Math.random()*a[0])});
     
     this.addCommand('sum',2,['add'],function (a) {var sum = 0; for (var i in a) {sum+=a[i]}; return sum;});
     this.addCommand('difference',2,['sub'],function (a) {return a[0]-a[1]});
