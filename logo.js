@@ -238,6 +238,7 @@ Logo.prototype.setup = function () {
         for (var i in list) {
             list[i] = 0;
         }
+        return list;
     });
    
     this.addPrimitive('forever',1,null,function (args) {
