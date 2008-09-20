@@ -161,12 +161,13 @@ DelayCommand.prototype.call = function (that) {
 }
 
 
-function DelayTurtle (canvas, speed) {
+function DelayTurtle (canvas, speed, draw_bits) {
     this.turtle = new Turtle(canvas);
     this.pipeline = null;
     this.active = false;
     this.halt = false;
     this.speed = speed
+    this.drawbits = (draw_bits == false) ? false : true;
 }
 
 DelayTurtle.prototype.start = function(){this.active = true; this.halt = false; this.pipeline = new Array(); this.paint();};
@@ -196,10 +197,14 @@ DelayTurtle.prototype.addCommand = function (fun, args) {
 // There must be a nicer way to do this
 
 DelayTurtle.prototype.forward = function(d) {
-    var l = Math.abs(d);
-    var s = l/d; 
-    for (var c = 0; c < l; c++ ) {
-        this.addCommand(this.turtle.forward,[s])
+    if (this.drawbits) {
+        var l = Math.abs(d);
+        var s = l/d; 
+        for (var c = 0; c < l; c++ ) {
+            this.addCommand(this.turtle.forward,[s])
+        }
+    } else {
+        this.addCommand(this.turtle.forward,[d]);
     }
 };
 DelayTurtle.prototype.backward = function(d) { this.forward(-d)};
@@ -214,14 +219,22 @@ DelayTurtle.prototype.penwidth = function() { this.addCommand(this.turtle.penwid
 DelayTurtle.prototype.color = function() { this.addCommand(this.turtle.color,arguments)};
 
 DelayTurtle.prototype.arc = function(radius, angle) { 
-    var end = (360+angle) % 360 ; 
-    for (var c = 0; c <= end; c++ ) {
-        this.addCommand(this.turtle.arc_point,[radius,c])
+    if (this.drawbits) {
+        var end = (360+angle) % 360 ; 
+        for (var c = 0; c <= end; c++ ) {
+            this.addCommand(this.turtle.arc_point,[radius,c])
+        }
+    } else {
+        this.addCommand(this.turtle.arc,[radius,angle])
     }
 };
 DelayTurtle.prototype.circle = function(radius) {
-    for (var c = 0; c < 360; c++ ) {
-        this.addCommand(this.turtle.arc_point,[radius,c])
+    if (this.drawbits) {
+        for (var c = 0; c < 360; c++ ) {
+            this.addCommand(this.turtle.arc_point,[radius,c])
+        }
+    } else {
+        this.addCommand(this.turtle.circle,[radius])
     }
 };
 

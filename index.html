@@ -40,7 +40,7 @@ function setup () {
     logo = new Logo()
     
     fast = 5;
-    turtle = new DelayTurtle(canvas,fast);
+    turtle = new DelayTurtle(canvas,fast,true);
     logo.setTurtle(turtle);
 }
 
@@ -68,7 +68,7 @@ koch 5 4\n\
 
 
 
-function run (speed) {
+function run (speed,drawbits) {
         if (speed != fast) {
             fast = speed;
             var newturtle = null;
@@ -76,7 +76,7 @@ function run (speed) {
             if (fast == 0) {
                 newturtle = new Turtle(canvas);
             } else {
-                newturtle = new DelayTurtle(canvas,fast);
+                newturtle = new DelayTurtle(canvas,fast,drawbits);
             }
             logo.setTurtle(newturtle);
             turtle = newturtle;
@@ -248,8 +248,8 @@ Note: Simple Tail recursion is supported.
     <textarea id="code"></textarea>
     </div>
     <div>
-    <input type="button" onClick="run(25);" value="run and draw very slowly"/>
-    <input type="button" onClick="run(5);" value="run and draw slowly"/>
+    <input type="button" onClick="run(25,true);" value="run and draw very slowly"/>
+    <input type="button" onClick="run(5,false);" value="run and draw slowly"/>
     <input type="button" onClick="stop();" value="stop"/>
     <input type="button" onClick="run(0);" value="run  and draw fast"/>
     

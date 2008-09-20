@@ -168,8 +168,10 @@ Logo.prototype.setup = function () {
     this.addCommand('log10',1,null,function (a) {return Math.LOG10E * Math.log(a[0])});
     this.addCommand('sin',1,null,function (a) {return Math.sin(a[0]/180*Math.PI)});
     this.addCommand('cos',1,null,function (a) {return Math.cos(a[0]/180*Math.PI)});
+    this.addCommand('arctan',1,null,function (a) {return Math.atan(a[0])*180/Math.PI});
     this.addCommand('radsin',1,null,function (a) {return Math.sin(a[0])});
     this.addCommand('radcos',1,null,function (a) {return Math.cos(a[0])});
+    this.addCommand('radarctan',1,null,function (a) {return Math.atan(a[0])});
 
     this.addCommand('random',1,['rand'],function (a) {var b= Math.floor(this.random()*a[0]); return b;});
     this.addCommand('rerandom',1,['srand'],function (a) {return this.srand(a[0])});
