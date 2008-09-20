@@ -165,6 +165,7 @@ Logo.prototype.setup = function () {
     this.addCommand('butfirst',1,['tail','bf'],function (a) {return a[0].slice(1);});
     this.addCommand('butlast',1,['bl'],function (a) {var b = a[0]; return b.slice(0,b.length-1);});
     this.addCommand('item',2,null,function (a) {var b = a[1]; return b[a[0]];});
+    this.addCommand('setitem',3,null,function (a) {var b = a[1]; b[a[0]]= a[2];});
 
     this.addCommand('empty?',1,['emptyp'],function (a) {return a[0].length == 0});
 
@@ -230,6 +231,14 @@ Logo.prototype.setup = function () {
     this.addInfix('>=','greaterequal?',60);
 
     this.addConstant('stop',new Token('stop',null));
+
+
+    this.addCommand('array',1,null,function (a) {
+        var list = new Array(a[0]);
+        for (var i in list) {
+            list[i] = 0;
+        }
+    });
    
     this.addPrimitive('forever',1,null,function (args) {
             if (args && args.length == 1) { 
