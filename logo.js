@@ -20,6 +20,8 @@ function Logo () {
     this.constant = new Array();
     
     this.alias = new Array();
+
+    this.repcount = -1;
     this.setup();
 }
 
