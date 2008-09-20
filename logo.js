@@ -159,6 +159,16 @@ Logo.prototype.setup = function () {
     this.addTurtleCommand('reset',0,null);
 
 
+    this.addCommand('first',1,['head'],function (a) {return a[0][0];});
+    this.addCommand('last',1,null,function (a) {var b = a[0]; return b[b.length];});
+
+    this.addCommand('butfirst',1,['tail','bf'],function (a) {return a[0].slice(1);});
+    this.addCommand('butlast',1,['bl'],function (a) {var b = a[0]; return b.slice(0,b.length-1);});
+    this.addCommand('item',2,null,function (a) {var b = a[1]; return b[a[0]];});
+
+    this.addCommand('empty?',1,['emptyp'],function (a) {return a[0].length == 0});
+
+
     this.addCommand('int',1,null,function (a) {return Math.floor(a[0])});
     this.addCommand('round',1,null,function (a) {return Math.round(a[0])});
     this.addCommand('sqrt',1,null,function (a) {return Math.sqrt(a[0])});
