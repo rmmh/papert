@@ -7,6 +7,8 @@ function Logo () {
     this.setTurtle = function(turtle) {
         this.turtle = turtle;
     }
+    var d = new Date()
+    this.seed = d.getTime()/1000;
     
     this.functions = new SymbolTable();
     this.values = new SymbolTable();
@@ -23,6 +25,15 @@ function Logo () {
 
     this.repcount = -1;
     this.setup();
+}
+
+Logo.prototype.random = function () {
+    this.seed = (this.seed * 214013 + 2531011)%4294967296;
+    return ((this.seed >> 16) & 0x7fff) / 32768.0;
+}
+
+Logo.prototype.srand = function(seed) {
+    this.seed = seed;
 }
 
 Logo.prototype.addAlias = function (name, wrd) {
@@ -160,7 +171,13 @@ Logo.prototype.setup = function () {
     this.addCommand('radsin',1,null,function (a) {return Math.sin(a[0])});
     this.addCommand('radcos',1,null,function (a) {return Math.cos(a[0])});
 
-    this.addCommand('random',1,['rand'],function (a) {return Math.floor(Math.random()*a[0])});
+    this.addCommand('random',1,['rand'],function (a) {var b= Math.floor(this.random()*a[0]); return b;});
+    this.addCommand('rerandom',1,['srand'],function (a) {return this.srand(a[0])});
+    
+    this.addCommand('bitand',2,null,function (a) {var sum = 1; for (var i in a) {sum=sum&a[i]}; return sum;});
+    this.addCommand('bitor',2,null,function (a) {var sum = 0; for (var i in a) {sum=sum|a[i]}; return sum;});
+    this.addCommand('bitxor',2,null,function (a) {var sum = 0; for (var i in a) {sum=sum|a[i]}; return sum;});
+    this.addCommand('bitnot',1,null,function (a) { return  ~a[0]});
     
     this.addCommand('sum',2,['add'],function (a) {var sum = 0; for (var i in a) {sum+=a[i]}; return sum;});
     this.addCommand('difference',2,['sub'],function (a) {return a[0]-a[1]});
