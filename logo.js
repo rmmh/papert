@@ -168,6 +168,8 @@ Logo.prototype.setup = function () {
 
     this.addCommand('empty?',1,['emptyp'],function (a) {return a[0].length == 0});
 
+    this.addCommand('fput',2,null,function (a) {var b = a[1]; return [a[0]].concat(b.slice(0));});
+    this.addCommand('lput',2,null,function (a) {var b = a[1]; return b.slice(0).concat(a[0]);});
 
     this.addCommand('int',1,null,function (a) {return Math.floor(a[0])});
     this.addCommand('round',1,null,function (a) {return Math.round(a[0])});
