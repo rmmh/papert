@@ -504,9 +504,36 @@ Logo.prototype.eval = function (code) {
         } else if (this.functions.get(code.data) != null) { // a user defined function
 
             var f = this.functions.get(code.data);
+            
+            if (f.code == null) { // time for some runparsing
+                //alert("runparsing "+code.data);
+                var t = new ListTokenizer(f.raw);
+                this.p.load(t);
+                
+                var l = new Array();
+                do {
+                    var i = this.p.next();
+                    //alert("parsed "+i);
+                    if (i == null) { ret =new Token('error','I can\'t parse this function '+code.data); break;}
+                    if (i.type == "error") {return i}
+                    if (i.type == "eof") break;
+                    
+
+                    l.push(i);
+                    
+                } while (1);
+                
+                //alert(l);
+                this.p.load(this.t);
+            
+                f.code = l;
+            }
             var last = f.code[f.code.length-1];
             var newvalues = new SymbolTable(this.values);
 
+            if (code.args.length != f.args.length) {
+                return new Token('error',code.data+" only takes "+f.args.length+" arguments, you passed "+code.args.length);
+            }
             for (var c  in code.args) {
                 var name = f.args[c].data;
                 var value = this.eval(code.args[c]);
@@ -761,7 +788,7 @@ Parser.prototype.next = function (precedent) {
             
             do {
                 
-                i = this.next();
+                i = this.tk.next();
                 if (i == null) return new Token('error','I don\'t know how to tokenize this');
                 if (i.type == "error") return i;
                 if (i.type == "eof") return new Token('error','to '+name+' needs an end');
@@ -826,8 +853,8 @@ Parser.prototype.next = function (precedent) {
 
 function Command (args,code) {
     this.args = args;
-    this.code = code;
-    
+    this.raw = code;
+    this.code = null;    
 }
 
 
@@ -846,10 +873,42 @@ Token.prototype.toString = function () {
 
 
 
+
+function ListTokenizer (list) {
+    //alert("list tokenizer "+list);
+    this.list = list;
+    this.current = 0;
+ }
+ 
+ListTokenizer.prototype.peek = function () {
+    if (this.current >= this.list.length) {
+        return new Token('eof','');
+    } else {
+        var peek=this.list[this.current];
+        //alert("peek is "+peek);
+        return peek;
+    }
+}
+
+ 
+ListTokenizer.prototype.next = function () {
+    if (this.current >= this.list.length) {
+        return new Token('eof','');
+    } else {
+        var next = this.list[this.current];
+        //alert("next is "+next);
+        this.current++;
+        return next;
+        
+    }
+}
+
+
+
 function Tokenizer () {
 
     this.text = null;
-    this.cache = new Array()
+    this.cache = new Array();
  }
  
 Tokenizer.prototype.load = function (text) {
