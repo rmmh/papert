@@ -240,6 +240,36 @@ Logo.prototype.setup = function () {
         }
         return list;
     });
+    
+    this.addCommand('make',2,null,function (args) {
+        //alert(args);
+        if (args && args.length == 2) {
+            if (args[0]) {
+                var name = args[0]
+                var value = args[1];
+                if (value == null) return new Token('error','Can\'t set '+name+' to null');
+        
+                //alert("make "+name+" "+value);
+                this.values.set(name,value);
+            } else {
+                return new Token('error','I can\'t make - '+args[0]+' is not a symbol');
+            }
+        } else {
+            return new Token('error','I can\'t make, I need two arguments');
+        }
+    });
+    
+    this.addCommand('global',1,null,function (args) {
+        //alert(args);
+        if (args) {
+            for (var i in args) {
+                this.values.make_global(args[i]);
+            } 
+        } else {
+            return new Token('error','I can\'t make '+args+ 'global');
+        }
+    });
+    
    
     this.addPrimitive('forever',1,null,function (args) {
             if (args && args.length == 1) { 
@@ -391,26 +421,7 @@ Logo.prototype.setup = function () {
         }
     );
         
-    this.addPrimitive('make',2,null,function (args) {
-            if (args && args.length == 2) {
-                if (args[0].type == "sym") {
-                    var name = this.eval(args[0]);
-                    if (name == null) return new Token('error','Can\'t make with no name');
-                    if (name && name.type == "error") return name;
-            
-                    var value = this.eval(args[1]);
-                    if (value == null) return new Token('error','Can\'t set '+name+' to null');
-                    if (value && value.type == "error") return value;
-            
-                    //alert("make "+name+" "+value);
-                    this.values.set(name,value);
-                } else {
-                    return new Token('error','I can\'t make - '+args[0].data+' is not a symbol');
-                }
-            }
-        }
-    )
-    
+
     this.addConstant('true',true);
     this.addConstant('false',false);
     
@@ -582,13 +593,29 @@ Logo.prototype.eval_list = function(args) {
 function SymbolTable (par) {
     this.par = par;
     this.table = new Array();
+    this.globalsyms = new Array();
+    
+    if (par != null && par.globaltable != null) {
+        this.globaltable = par.globaltable;
+    } else {
+        this.globaltable = par;
+    }
+}
+
+SymbolTable.prototype.make_global = function (key) {
+    this.globalsyms["_"+key] = true
 }
 
 SymbolTable.prototype.get = function (key) {
     var mkey = "_"+key;
-    var r = this.table[mkey];
-    if (r == null && this.par != null) {
-        t = this.par.get(key);
+    var r = null;
+    if (this.globalsyms[mkey] != null) {
+        r = this.globaltable.get(key);
+    } else {
+        var r = this.table[mkey];
+        if (r == null && this.par != null) {
+            r = this.par.get(key);
+        }
     }
     return r;
 }
@@ -596,9 +623,13 @@ SymbolTable.prototype.get = function (key) {
 
 SymbolTable.prototype.set = function (key,value) {
     var mkey = "_" + key;
-    //alert(key+":"+value);
-    this.table[mkey] = value;
-    //alert("set!");
+    if (this.globalsyms[mkey] != null) {
+        this.globaltable.set(key,value);
+    } else {
+        //alert(key+":"+value);
+        this.table[mkey] = value;
+        //alert("set!");
+    } 
 }
 
 
