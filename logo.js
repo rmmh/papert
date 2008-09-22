@@ -105,7 +105,6 @@ Logo.prototype.setup = function () {
     });
     
     this.addCommand('setheading',1,['seth'], function (a) { 
-        alert('foo');
         if (parseFloat(a[0]) != a[0]) return new Token('error','Can only set heading to a number, not '+a[0])
         this.turtle.setheading(a[0]);
     });
@@ -531,7 +530,10 @@ Logo.prototype.eval = function (code) {
             var last = f.code[f.code.length-1];
             var newvalues = new SymbolTable(this.values);
 
-            if (code.args.length != f.args.length) {
+            if (code.args == null && f.args.length > 0) {
+                return new Token('error',code.data+" only takes "+f.args.length+" arguments, you passed none");
+            }
+            if (code.args != null && code.args.length != f.args.length) {
                 return new Token('error',code.data+" only takes "+f.args.length+" arguments, you passed "+code.args.length);
             }
             for (var c  in code.args) {
@@ -578,6 +580,7 @@ Logo.prototype.eval = function (code) {
                 this.values = newvalues;
          
                 var result = this.eval_list(f.code);
+                //alert(result);
                 
                 if (result && result.type == "stop") { result = result.data };
 
@@ -644,6 +647,7 @@ SymbolTable.prototype.get = function (key) {
             r = this.par.get(key);
         }
     }
+    //alert("getting "+key+" = "+r);
     return r;
 }
 
@@ -651,11 +655,11 @@ SymbolTable.prototype.get = function (key) {
 SymbolTable.prototype.set = function (key,value) {
     var mkey = "_" + key;
     if (this.globalsyms[mkey] != null) {
+        //alert("global set");
         this.globaltable.set(key,value);
     } else {
-        //alert(key+":"+value);
+        //alert("setting "+key+":"+value);
         this.table[mkey] = value;
-        //alert("set!");
     } 
 }
 
