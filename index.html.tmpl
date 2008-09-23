@@ -76,12 +76,16 @@ function clearcanvas() {
 <div id="top"><div class="inner"><h1>papert &#8213; logo in your browser</h1>
 <h2>
 examples:
-<a href="/agpwYXBlcnRsb2dvchELEgtMb2dvUHJvZ3JhbRgCDA">koch snowflake</a> |
-<a href="/agpwYXBlcnRsb2dvchELEgtMb2dvUHJvZ3JhbRgDDA">hilbert curve</a> | 
-<a href="/agpwYXBlcnRsb2dvchILEgtMb2dvUHJvZ3JhbRjLAQw">spiral</a>
+<a href="/agpwYXBlcnRsb2dvchELEgtMb2dvUHJvZ3JhbRgIDA">koch snowflake</a> |
+<a href="/agpwYXBlcnRsb2dvchELEgtMb2dvUHJvZ3JhbRgJDA">hilbert curve</a> | 
+<a href="/agpwYXBlcnRsb2dvchILEgtMb2dvUHJvZ3JhbRjRAQw">spiral</a>
 </h2>
 {% if key %}
-<h3>share this: <input size="60" type="text" value="&lt;a href=&quot;http://logo.twentygototen.org/{{key}}&quot;&gt;&lt;img src=&quot;http://logo.twentygototen.org/{{key}}/img&quot;/&gt;&lt;br/&gt;Run this program on logo.twentygototen.org&lt;/a&gt;" readonly>
+<h3>share this program: <a href="http://logo.twentygototen.org/{{key|escape}}">link to it</a><br/>
+html snippet : <input size="30" type="text" value="&lt;a href=&quot;http://logo.twentygototen.org/{{key|escape}}&quot;&gt;&lt;img src=&quot;http://logo.twentygototen.org/{{key|escape}}/img&quot;/&gt;&lt;br/&gt;Run this program on logo.twentygototen.org&lt;/a&gt;" readonly><br/>
+bbcode: <br/>
+<TEXTAREA READONLY="true" ROWS="2" COLS="60" SIZE="60">[url=http://logo.twentygototen.org/{{key|escape}}][img]http://logo.twentygototen.org/{{key|escape}}/img[/img]
+Run this program on logo.twentygototen.org[/url]</textarea>
 </h3>
 {% endif %}
 </div></div>
