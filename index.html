@@ -1,38 +1,102 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>online logo interpreter in javascript</title>
-<!-- $Id$ -->
-<style>
-canvas { border:1px solid black;}
-#oldcode {font-family: monospace;display: block; white-space: pre;overflow: scroll; margin: 10px;}
-.left {float:left; width:500px;}
-.right {float:left; margin-left: 10px; width:400px;}
+<meta http-equiv="Content-Type" content="text/html; charset=iso-utf8" />
+<title>papert: logo in your browser</title>
+<style type="text/css">
+body{
+    margin: 0;
+    padding: 0;
+}
+
+#main{
+    width: 950px;
+    margin: auto auto;
+}
+
+#wrap{
+    float: left;
+    width: 100%;
+    height: 100%;
+}
+
+#content{
+    float: left;
+    width:430px;
+    margin-left: 520px;
+    background: #93B9FF;
+    height: 560px; /* I hate CSS */
+}
+
+#oldcode {
+    font-family: monospace;
+    white-space: pre;
+    overflow: scroll;
+    margin-right: 10px;
+    height: 200px;
+    width:100%;
+}
+
+
+#code {
+    width: 100%;
+    height: 300px;
+}
+
+#left{
+    float: left;
+    width: 520px;
+    margin-left: -950px;
+    height: 560px;
+    background: #5370C0;
+}
+
+#canvas {
+    margin: 10px 0 10px 0;
+}
+
+#notes {
+    clear: left;
+    width: 100%;
+    padding: 4px 0;
+    margin-left: 100px;
+}
+
+#footer{
+    clear: left;
+    width: 100%;
+    background: black;
+    color: #FFF;
+    text-align: center;
+    padding: 4px 0;
+}
+
+#footer a{
+color: #FFFF80;
+}
+
+.inner{
+    margin: 2px 2px 2px 10px;
+}
 
 </style>
 <script src="turtle.js"></script>
 <script src="logo.js"></script>
-<script src="third/base64.js"></script>
-<script src="third/canvas2image.js"></script>
-
 <script>
-
 var turtle = null;
 var logo = null;
+var canvas;
+var form;
 
 function init (canvas_id,form_id,oldcode_id) {
-    
-    var canvas = document.getElementById(canvas_id);
-    var form = document.getElementById(form_id);
+    canvas = document.getElementById(canvas_id);
+    form = document.getElementById(form_id);
     
     canvas.width = 500;
     canvas.height = 500;
     
-    form.code.style.width = "90%";
-    form.code.style.height = "200px";
-    
     oldcode = document.getElementById(oldcode_id);
-    oldcode.style.width = "90%";
-    oldcode.style.height = "300px";
     setup();
 }
 
@@ -47,22 +111,23 @@ function setup () {
 function koch() {
     form.code.value ='\
 to line :count :length\n\
-ifelse :count = 1 [fw :length] [\n\
-make "count :count -1 \n\
-line :count :length\n\
-lt 60 line :count :length\n\
-rt 120 line :count :length\n\
-lt 60 line :count :length]\n\
+  ifelse :count = 1 [fw :length] [\n\
+    make "count :count -1 \n\
+    line :count :length\n\
+    lt 60 line :count :length\n\
+    rt 120 line :count :length\n\
+    lt 60 line :count :length\n\
+  ]\n\
 end\n\
 \n\
 to koch :count :length\n\
-rt 30 line :count :length\n\
-rt 120 line :count :length\n\
-rt 120 line :count :length\n\
+  rt 30 line :count :length\n\
+  rt 120 line :count :length\n\
+  rt 120 line :count :length\n\
 end\n\
 \n\
 reset\n\
-setxy  10 400\n\
+setxy  80 350\n\
 koch 5 4\n\
 ';}
 
@@ -98,18 +163,55 @@ function run (speed,drawbits) {
 function stop(){
     turtle.stop();
 }
-    
+
+function clearcanvas() {
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = "rgb(255,255,255)";
+    ctx.fillRect(0, 0, 500, 500);
+}
 </script>
+
 </head>
-<body onload="init('canvas','form','oldcode');">
-<div class="left column">
-<p><canvas id="canvas" width="500" height="500">
-Is broken
-</canvas>
-</p>
-<input type="button" onClick="Canvas2Image.saveAsPNG(canvas)" value="save as png"> 
+<body onload="init('canvas','input','oldcode'); clearcanvas()">
+    
+<div id="main">
+<div id="top"><div class="inner"><h1>papert: logo in your browser</h1></div></div>
+
+<div id="wrap">
+<div id="content">
+    <div class="inner">
+        <form id="input" onSubmit="run(); return false;" action="#">
+        <div id="oldcode">&nbsp;</div>
+        <div>
+        <textarea id="code"></textarea>
+        </div>
+        <div>run
+        <input type="button" onClick="run(25,true);" value="slow"/>
+        <input type="button" onClick="run(5,false);" value="normal"/>
+        <input type="button" onClick="run(0);" value="fast"/>
+        <input type="button" onClick="stop();" value="stop"/>
+        
+        
+        <input type="button" value="koch example" onClick="koch(); run(0)"/>
+        </div>
+        </form>
+    </div>
+</div>
+</div>
+
+<div id="left">
+    <div class="inner">
+        <canvas id="canvas" width="500" height="500">
+    Is broken
+    </canvas>
+    <input type="button" onClick="document.location.href = canvas.toDataURL().replace('image/png', 'image/octet-stream')" value="save as png">
+    <input type="button" onClick="clearcanvas();" value="clear">
+</div>
+</div>
+<div id="footer"><a href="http://code.google.com/p/papert">papert on google code</a></div>
+<div id="notes">
 <pre>
-Quick reference logo guide, although please check the google code page for up to date information and more sample programs: <A href="http://code.google.com/p/papert">http://code.google.com/p/papert</a>
+Quick reference logo guide:
 
 Stuff should work in lower or upper case.
 
@@ -198,10 +300,10 @@ AND TRUE FALSE          OR FALSE TRUE
 Conditionals:
 
 IF COND [IF_TRUE] 
-IF 2 > 1 [FW 100]
+IF 2 &gt; 1 [FW 100]
 
 IFELSE COND [IF_TRUE] [IF_FALSE]
-IFELSE 2 > 1 [FW 100 RT 90] [BW 100 LT 90]
+IFELSE 2 &gt; 1 [FW 100 RT 90] [BW 100 LT 90]
 
 
 Setting and getting:
@@ -237,31 +339,9 @@ END
 POLYGON 5 10
 
 Note: Simple Tail recursion is supported.
-
-
 </pre>
 </div>
-<div class="right column">
-    <form id="form" onSubmit="run(); return false;" action="#">
-    <div id="oldcode">&nbsp;</div>
-    <div>
-    <textarea id="code"></textarea>
-    </div>
-    <div>
-    <input type="button" onClick="run(25,true);" value="run and draw very slowly"/>
-    <input type="button" onClick="run(5,false);" value="run and draw slowly"/>
-    <input type="button" onClick="stop();" value="stop"/>
-    <input type="button" onClick="run(0);" value="run  and draw fast"/>
-    
-    
-    <input type="button" value="koch example" onClick="koch()"/>
-    </div>
-    </form>
+
 </div>
-
-<a href="http://code.google.com/p/papert">papert on google code</a>
-
-
-
 </body>
 </html>
