@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-utf8" />
+<title>papert: logo in your browser</title>
+<link rel="stylesheet" type="text/css" href="papert.css">
+<script src="turtle.js"></script>
+<script src="logo.js"></script>
+<script>
+var turtle = null;
+var logo = null;
+var canvas;
+var form;
+
+function init (canvas_id,form_id,oldcode_id) {
+    canvas = document.getElementById(canvas_id);
+    form = document.getElementById(form_id);
+    
+    canvas.width = 500;
+    canvas.height = 500;
+    
+    oldcode = document.getElementById(oldcode_id);
+    setup();
+}
+
+function setup () {
+    logo = new Logo()
+    
+    fast = 5;
+    turtle = new DelayTurtle(canvas,fast,true);
+    logo.setTurtle(turtle);
+}
+
+function koch() {
+    form.code.value ='\
+to line :count :length\n\
+  ifelse :count = 1 [fw :length] [\n\
+    make "count :count -1 \n\
+    line :count :length\n\
+    lt 60 line :count :length\n\
+    rt 120 line :count :length\n\
+    lt 60 line :count :length\n\
+  ]\n\
+end\n\
+\n\
+to koch :count :length\n\
+  rt 30 line :count :length\n\
+  rt 120 line :count :length\n\
+  rt 120 line :count :length\n\
+end\n\
+\n\
+reset\n\
+setxy  80 350\n\
+koch 5 4\n\
+';}
+
+
+
+function run (speed,drawbits) {
+        if (speed != fast) {
+            fast = speed;
+            var newturtle = null;
+            turtle.stop();
+            if (fast == 0) {
+                newturtle = new Turtle(canvas);
+            } else {
+                newturtle = new DelayTurtle(canvas,fast,drawbits);
+            }
+            logo.setTurtle(newturtle);
+            turtle = newturtle;
+        }
+        var code = form.code.value;
+
+        oldcode.innerHTML +="\n"+code
+        //form.code.value = ""
+
+        
+        var out = logo.run(code);
+                
+        if (out && out.type == "error") {
+            alert(out.data);
+            setup();
+        }
+}
+
+function stop(){
+    turtle.stop();
+}
+
+function clearcanvas() {
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = "rgb(255,255,255)";
+    ctx.fillRect(0, 0, 500, 500);
+}
+</script>
+
+</head>
+<body onload="init('canvas','input','oldcode'); clearcanvas()">
+    
+<div id="main">
+<div id="top"><div class="inner"><h1>papert: logo in your browser</h1></div></div>
+
+<div id="wrap">
+<div id="content">
+    <div class="inner">
+        <form id="input" onSubmit="run(); return false;" action="#">
+        <div id="oldcode">&nbsp;</div>
+        <div>
+        <textarea id="code"></textarea>
+        </div>
+        <div>run
+        <input type="button" onClick="run(25,true);" value="slow"/>
+        <input type="button" onClick="run(5,false);" value="normal"/>
+        <input type="button" onClick="run(0);" value="fast"/>
+        <input type="button" onClick="stop();" value="stop"/>
+        
+        
+        <input type="button" value="koch example" onClick="koch(); run(0)"/>
+        </div>
+        </form>
+    </div>
+</div>
+</div>
+
+<div id="left">
+    <div class="inner">
+        <canvas id="canvas" width="500" height="500">
+    Is broken
+    </canvas>
+    <input type="button" onClick="document.location.href = canvas.toDataURL().replace('image/png', 'image/octet-stream')" value="save as png">
+    <input type="button" onClick="clearcanvas();" value="clear">
+</div>
+</div>
+<div id="footer"><a href="http://code.google.com/p/papert">papert on google code</a></div>
+<div id="notes">
+<pre>
+Quick reference logo guide:
+
+Stuff should work in lower or upper case.
+
+Types:
+
+WORDS:          FW BW ....
+NUMBERS:        0, 0.1, 20
+LISTS:          [1 2 3 5]
+SYMBOLS:        "foo "bar
+VARIABLES:      :foo :bar 
+FUNCTION CALLS: COMMAND arg arg arg ...
+                (COMMAND arg arg arg ...)
+
+Supported Commands:
+
+RESET           Clear the screen, move home.
+
+
+Turtle Movement:
+
+FORWARD n       Move the turtle forward n pixels
+FW n    
+
+BACKWARD n      Move the turtle backward n pixels
+
+RIGHT n         Move the turtle left or right n degrees
+RT n
+LEFT n
+LT n
+
+SETX x          Set the co-ordinates of the turtle
+SETY y
+SETXY x y
+
+HOME            Move the turtle to the home position
+
+
+Drawing:
+
+CLEARSCREEN     Clear the screen
+CLEAR
+CS
+
+CIRCLE r        Draw a Circle of radius r around the turtle
+
+ARC r d         Draw an arc of radius r for d degrees
+
+PENUP           Lift the pen up and down
+PU
+PENDOWN
+PD
+
+COLOR [r g b]   Set the pen color
+
+PENWIDTH w      Set the pen width
+
+
+Arithmetic:
+
+1 + 2                   1 * 2
+SUM 1 2                 PRODUCT 1 2
+(SUM 1 2 3 ...)         (PRODUCT 1 2 3 ...)
+
+1 - 2                   1 / 2
+DIFFERENCE 1 2          DIVIDE 1 2
+
+1 % 2
+MOD 1 2
+
+Logical and Comparison:
+
+1 = 1
+EQUAL? 1 1
+EQUALP 1 1
+
+1 &lt; 2                1 &lt;= 2
+LESS? 1 2               LESSEQUAL? 1 2
+LESSP 1 2               LESSEQUALP 1 2
+
+2 &gt; 1                2 &gt; 1
+GREATER? 2 1            GREATEREQUAL? 2 1
+GREATERP 2 1            GREATEREQUALP 2 1
+
+AND TRUE FALSE          OR FALSE TRUE
+
+Conditionals:
+
+IF COND [IF_TRUE] 
+IF 2 &gt; 1 [FW 100]
+
+IFELSE COND [IF_TRUE] [IF_FALSE]
+IFELSE 2 &gt; 1 [FW 100 RT 90] [BW 100 LT 90]
+
+
+Setting and getting:
+
+Set x to 1:             make "x 1
+Adding :n to :x         :n + :x
+Setting :x to :n + :x   make "x :x + :n
+
+Looping:
+
+REPEAT n [COMMANDS ...]
+
+STOP    - Stop the current Repeat or function.
+
+OUTPUT f  - Return f.
+OP f
+
+
+Defining and Calling:
+
+TO FOO :ARG1 :ARG2 BODY END
+
+TO SQUARE :length 
+REPEAT 4 [FW :length RT 90]
+END
+
+SQUARE :10
+
+TO POLYGON :length :sides
+REPEAT :sides [FW :length RT 360/:sides]
+END
+
+POLYGON 5 10
+
+Note: Simple Tail recursion is supported.
+</pre>
+</div>
+
+</div>
+</body>
+</html>
