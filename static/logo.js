@@ -927,7 +927,7 @@ Tokenizer.prototype.num_rx = /^\s*(\d+(?:\.\d+)?)\s*/i;
 Tokenizer.prototype.sym_rx = /^\s*"([a-zA-Z]\w*)\s*/i;
 
 Tokenizer.prototype.empty = /^\s*$/;
-Tokenizer.prototype.comment = /^\s*;.*\n/;
+Tokenizer.prototype.comment = /^\s*;.*(\r?\n|$)/;
 
 Tokenizer.prototype.peek = function () {
     if (this.cache.length > 0) { 
@@ -943,7 +943,6 @@ Tokenizer.prototype.next = function () {
     if (this.cache.length > 0) {
         return this.cache.shift();
     }
-
     while ((result = this.comment.exec(this.text)) != null) {
         this.text = this.text.substring(result[0].length)
     }
