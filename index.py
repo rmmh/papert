@@ -23,7 +23,8 @@ class Papert(webapp.RequestHandler):
     if key:
         try:
             program = db.get(key)
-            values['code'] = program.code
+            if program:
+                values['code'] = program.code
         except db.BadKeyError:
             pass
 
