@@ -556,7 +556,7 @@ Logo.prototype.eval = function (code) {
                     this.values = newvalues;
                     var result = this.eval_list(f.code);
                     
-                    if (result && result.type == "stop") {
+                    if (result && (result.type == "stop" || result.type = "error")) {
                         this.values = par; // restore the original stack
                         f.code.push(tail); // restore the original tail.
                         return result.data;
