@@ -4,22 +4,46 @@ import os
 from google.appengine.ext.webapp import template
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.ext import db
+
+class LogoProgram(db.Model):
+    code = db.TextProperty()
+
 
 class Papert(webapp.RequestHandler):
   def get(self):
       
-    query = self.request.path.split('/',1)[1]
-    
-    try:
-        program_id = int(query)
-    except ValueError:
-        program_id = 0
+    key = self.request.path.split('/',1)[1]
     
     page = os.path.join(os.path.dirname(__file__), 'index.html.tmpl')
     
-    values = {}
+    values = {'code':""}
     
+    if key:
+        try:
+            program = db.get(key)
+            values['code'] = program.code
+        except db.BadKeyError:
+            pass
+
+        
     self.response.out.write(template.render(page, values))
+
+  def post(self):
+    
+    code = self.request.get('code',None)
+    self.response.headers['Content-Type'] = 'text/plain'
+    self.response.out.write("cocks\n")
+
+
+    if code:
+        program = LogoProgram()
+        program.code = code
+        program.hash = hash
+        key = program.put()
+    else:
+        key = ""
+    self.redirect("/%s"%key)
     
 application = webapp.WSGIApplication([('/.*', Papert)],debug=True)
 

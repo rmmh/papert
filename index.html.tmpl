@@ -28,21 +28,19 @@ function setup () {
     logo = new Logo()
     
     fast = 5;
-    turtle = new DelayTurtle(canvas,fast,true);
+    turtle = new DelayTurtle(canvas,fast,false);
     logo.setTurtle(turtle);
 }
 
 
 function run (speed,drawbits) {
+        turtle.stop();
         if (speed != fast) {
             fast = speed;
             var newturtle = null;
-            turtle.stop();
-            if (fast == 0) {
-                newturtle = new Turtle(canvas);
-            } else {
-                newturtle = new DelayTurtle(canvas,fast,drawbits);
-            }
+/*          newturtle = new Turtle(canvas);
+*/
+            newturtle = new DelayTurtle(canvas,fast,drawbits);
             logo.setTurtle(newturtle);
             turtle = newturtle;
         }
@@ -72,7 +70,7 @@ function clearcanvas() {
 </script>
 
 </head>
-<body onload="init('canvas','input','oldcode'); clearcanvas()">
+<body onload="init('canvas','input','oldcode'); clearcanvas(); run(5,false);">
     
 <div id="main">
 <div id="top"><div class="inner"><h1>papert: logo in your browser</h1></div></div>
@@ -80,16 +78,19 @@ function clearcanvas() {
 <div id="wrap">
 <div id="content">
     <div class="inner">
-        <form id="input" onSubmit="run(); return false;" action="#">
+        <form id="input" action="/" method="post">
         <div id="oldcode">&nbsp;</div>
         <div>
-        <textarea id="code"></textarea>
+        <textarea name="code" id="code">{{code|escape}}</textarea>
         </div>
         <div>run
         <input type="button" onClick="run(25,true);" value="slow"/>
         <input type="button" onClick="run(5,false);" value="normal"/>
-        <input type="button" onClick="run(0);" value="fast"/>
+        <input type="button" onClick="run(1,false);" value="fast"/>
         <input type="button" onClick="stop();" value="stop"/>
+        <span style="margin-left: 30px;"><input type="submit" value="save program"/></span>
+        
+        
         </div>
         </form>
     </div>
