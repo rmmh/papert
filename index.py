@@ -8,6 +8,7 @@ from google.appengine.ext import db
 
 class LogoProgram(db.Model):
     code = db.TextProperty()
+    date = db.DateTimeProperty(auto_now_add=True)
 
 
 class Papert(webapp.RequestHandler):
