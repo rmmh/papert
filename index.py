@@ -28,7 +28,13 @@ class Papert(webapp.RequestHandler):
         program = memcache.get("program: %s" % hash)
         if program is None:
             program = LogoProgram.all().filter('hash = ', hash).get()
-            memcache.set("program: %s" % hash, program, 3600)
+            if program is None:
+                memcache.set("program: %s" % hash, "not found", 120)
+            else:
+                memcache.set("program: %s" % hash, program, 3600)
+
+        if program == "not found":
+            program = None
 
     if program and extra == ".png":
         self.response.headers['Content-Type'] = 'image/png'
