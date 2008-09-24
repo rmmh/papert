@@ -79,6 +79,7 @@ function clearcanvas() {
 <body onload="init('canvas','input','oldcode'); clearcanvas(); run(5,false);">
     
 <div id="main">
+<form id="input" action="/" method="post" onSubmit="this.img.value = canvas.toDataURL().replace('data:image/png;base64,','')">
 <div id="top"><div class="inner"><h1>papert &#8213; logo in your browser</h1>
 <h2>
 examples:
@@ -96,22 +97,18 @@ bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygot
 
 <div id="content">
     <div class="inner">
-        <form id="input" action="/" method="post" onSubmit="this.img.value = canvas.toDataURL().replace('data:image/png;base64,','')">
         <div id="oldcode">&nbsp;</div>
         <div>
         <textarea name="code" id="code" rows="80" cols="20">{{code|escape}}</textarea>
         </div>
-        <div>run
-        <input type="button" onClick="run(25,true);" value="slow" />
-        <input type="button" onClick="run(5,false);" value="normal" />
-        <input type="button" onClick="run(1,false);" value="fast" />
-        <input type="button" onClick="stop();" value="stop" />
+        <div style="margin: 5px;">
+        <input type="button" onClick="run(25,true);" value="run slowly" />
+        <input type="button" onClick="run(5,false);" value="run normally" style="font-weight: bold;"/>
+        <input type="button" onClick="run(1,false);" value="run fast" />
+        <input type="button" onClick="stop();" value="stop program" />
         <input type="hidden" name="img" />
-        <span style="margin-left: 30px;"><input type="submit" value="save program" /></span>
-        
-        
         </div>
-        </form>
+
     </div>
 </div>
 
@@ -120,10 +117,17 @@ bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygot
         <canvas id="canvas">
     Your browser doesn't support canvas tags. Please upgrade to a recent version of Firefox or Opera.
     </canvas>
+    <span style="float: left; margin-right: auto;">
+    <input type="submit" value="share this program" />
     <input type="button" onClick="document.location.href = canvas.toDataURL().replace('image/png', 'image/octet-stream')" value="save as png" />
-    <input type="button" onClick="clearcanvas();" value="clear" />
+    </span>
+     <span style="float: right;margin-left: auto; margin-right: 20px;">
+     <input type="button" onClick="clearcanvas();" value="clear" />
+     </span>
 </div>
+        
 </div>
+</form>
 <div id="footer"><a href="http://code.google.com/p/papert">papert on google code</a></div>
 <div id="notes">
 <pre>
