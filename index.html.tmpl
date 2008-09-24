@@ -2,13 +2,13 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-utf8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>papert: logo in your browser</title>
-<link rel="stylesheet" type="text/css" href="static/papert.css">
-<script src="static/turtle.js"></script>
-<script src="static/parser.js"></script>
-<script src="static/logo.js"></script>
-<script>
+<link rel="stylesheet" type="text/css" href="static/papert.css" />
+<script type="text/javascript" src="static/turtle.js"></script>
+<script type="text/javascript" src="static/parser.js"></script>
+<script type="text/javascript" src="static/logo.js"></script>
+<script type="text/javascript">
 var turtle = null;
 var logo = null;
 var canvas;
@@ -81,46 +81,42 @@ examples:
 <a href="/agpwYXBlcnRsb2dvchELEgtMb2dvUHJvZ3JhbRgJDA">hilbert curve</a> | 
 <a href="/agpwYXBlcnRsb2dvchILEgtMb2dvUHJvZ3JhbRjRAQw">spiral</a>
 </h2>
-{% if key %}
-<h3>share this program: <a href="http://logo.twentygototen.org/{{key|escape}}">link to it</a><br/>
-html snippet : <input size="30" type="text" value="&lt;a href=&quot;http://logo.twentygototen.org/{{key|escape}}&quot;&gt;&lt;img src=&quot;http://logo.twentygototen.org/{{key|escape}}/img&quot;/&gt;&lt;br/&gt;Run this program on logo.twentygototen.org&lt;/a&gt;" readonly><br/>
-bbcode: <br/>
-<TEXTAREA READONLY="true" ROWS="2" COLS="60" SIZE="60">[url=http://logo.twentygototen.org/{{key|escape}}][img]http://logo.twentygototen.org/{{key|escape}}/img[/img]
-Run this program on logo.twentygototen.org[/url]</textarea>
-</h3>
+{% if hash %}
+<h4>share this program: <a href="http://logo.twentygototen.org/{{hash|escape}}">link to it</a><br />
+html: <input readonly="readonly" id="htmlsnippet" value="&lt;a href=&quot;http://logo.twentygototen.org/{{hash|escape}}&quot;&gt;&lt;img src=&quot;http://logo.twentygototen.org/{{hash}}/img&quot;/&gt;&lt;br/&gt;Run at logo.twentygototen.org&lt;/a&gt;" /><br />
+bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygototen.org/{{hash}}][img]http://logo.twentygototen.org/{{hash}}.png[/img]Run at logo.twentygototen.org[/url]" />
+</h4>
 {% endif %}
 </div></div>
 
-<div id="wrap">
 <div id="content">
     <div class="inner">
         <form id="input" action="/" method="post" onSubmit="this.img.value = canvas.toDataURL().replace('data:image/png;base64,','')">
         <div id="oldcode">&nbsp;</div>
         <div>
-        <textarea name="code" id="code">{{code|escape}}</textarea>
+        <textarea name="code" id="code" rows="80" cols="20">{{code|escape}}</textarea>
         </div>
         <div>run
-        <input type="button" onClick="run(25,true);" value="slow"/>
-        <input type="button" onClick="run(5,false);" value="normal"/>
-        <input type="button" onClick="run(1,false);" value="fast"/>
-        <input type="button" onClick="stop();" value="stop"/>
-        <input type="hidden" name="img"/>
-        <span style="margin-left: 30px;"><input type="submit" value="save program"/></span>
+        <input type="button" onClick="run(25,true);" value="slow" />
+        <input type="button" onClick="run(5,false);" value="normal" />
+        <input type="button" onClick="run(1,false);" value="fast" />
+        <input type="button" onClick="stop();" value="stop" />
+        <input type="hidden" name="img" />
+        <span style="margin-left: 30px;"><input type="submit" value="save program" /></span>
         
         
         </div>
         </form>
     </div>
 </div>
-</div>
 
 <div id="left">
     <div class="inner">
-        <canvas id="canvas" width="500" height="500">
-    Is broken
+        <canvas id="canvas">
+    Your browser doesn't support canvas tags. Please upgrade a recent version of Firefox or Opera.
     </canvas>
-    <input type="button" onClick="document.location.href = canvas.toDataURL().replace('image/png', 'image/octet-stream')" value="save as png">
-    <input type="button" onClick="clearcanvas();" value="clear">
+    <input type="button" onClick="document.location.href = canvas.toDataURL().replace('image/png', 'image/octet-stream')" value="save as png" />
+    <input type="button" onClick="clearcanvas();" value="clear" />
 </div>
 </div>
 <div id="footer"><a href="http://code.google.com/p/papert">papert on google code</a></div>

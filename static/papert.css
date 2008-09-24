@@ -8,18 +8,22 @@ body{
     margin: auto auto;
 }
 
-#wrap{
-    float: left;
-    width: 100%;
-    height: 100%;
-}
-
 #content{
     float: left;
     width:430px;
     margin-left: 520px;
     background: #93B9FF;
     height: 560px; /* I hate CSS */
+}
+
+#htmlsnippet {
+    width: 800px;
+    font-size: 10px;
+}
+
+#bbcode {
+    width: 800px;
+    font-size: 10px;
 }
 
 #oldcode {
