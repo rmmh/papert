@@ -18,7 +18,12 @@ function init (canvas_id,form_id,oldcode_id) {
     canvas = document.getElementById(canvas_id);
     form = document.getElementById(form_id);
     
+    
+    // I hate opera, I hate firefox.
+    canvas.style.width = 500;
     canvas.width = 500;
+    
+    canvas.style.height = 500;
     canvas.height = 500;
     
     oldcode = document.getElementById(oldcode_id);
