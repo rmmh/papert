@@ -9,6 +9,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 from google.appengine.api import images
+from google.appengine.api import memcache
 
 class LogoProgram(db.Model):
     code = db.TextProperty()
@@ -27,10 +28,14 @@ class Papert(webapp.RequestHandler):
     program = None
     
     if hash:
-        program = LogoProgram.all().filter('hash = ', hash).get()
+        program = memcache.get("program: %s" % hash)
+        if program is None:
+            program = LogoProgram.all().filter('hash = ', hash).get()
+            memcache.set("program: %s" % hash, program, 3600)
 
     if program and extra == ".png":
         self.response.headers['Content-Type'] = 'image/png'
+        self.response.headers['Cache-Control'] = 'public'
         self.response.out.write(program.img)
     else:
         if program:
