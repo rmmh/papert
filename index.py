@@ -22,9 +22,6 @@ hash_re = re.compile(r"/([A-Za-z0-9_-]*)(.*)")
 class Papert(webapp.RequestHandler):
   def get(self):
     hash, extra = hash_re.match(self.request.path).groups()
-    
-    values = {'code':""}
-
     program = None
     
     if hash:
@@ -35,9 +32,12 @@ class Papert(webapp.RequestHandler):
 
     if program and extra == ".png":
         self.response.headers['Content-Type'] = 'image/png'
-        self.response.headers['Cache-Control'] = 'public'
+        self.response.headers['Cache-Control'] = 'max-age:604800'
+        self.response.headers['Etag'] = program.hash
+        self.response.headers['Last-Modified'] = program.date.ctime()
         self.response.out.write(program.img)
     else:
+        values = {'code':""}
         if program:
             values['code'] = program.code
             values['hash'] = hash
