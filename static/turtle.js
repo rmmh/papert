@@ -178,11 +178,13 @@ DelayTurtle.prototype.paint = function() {
     if (!this.halt) {
         var redraw = this.active;
         if (this.pipeline.length > 0) {
+            var c = 0;
             do {
                 var fun = this.pipeline.shift();
                 fun.call()
                 redraw = true;
-            } while (this.speed <= 1 && this.pipeline.length >0)
+                c++;
+            } while (this.speed <= 1 && c< 10 && this.pipeline.length >0)
         } 
         if (redraw) {
             var that = this;
