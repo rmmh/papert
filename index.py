@@ -22,16 +22,21 @@ hash_re = re.compile(r"/([A-Za-z0-9_-]*)(.*)")
 class Papert(webapp.RequestHandler):
   def get(self):
     hash, extra = hash_re.match(self.request.path).groups()
+   
+    if extra == ".png" and hash == self.request.headers.get('If-None-Match'):
+        self.response.set_status(304)
+        return
+
     program = None
-    
+
     if hash:
         program = memcache.get("program: %s" % hash)
         if program is None:
             program = LogoProgram.all().filter('hash = ', hash).get()
             if program is None:
-                memcache.set("program: %s" % hash, "not found", 120)
+                memcache.set("program: %s" % hash, "not found")
             else:
-                memcache.set("program: %s" % hash, program, 3600)
+                memcache.set("program: %s" % hash, program)
 
         if program == "not found":
             program = None
@@ -69,6 +74,7 @@ class Papert(webapp.RequestHandler):
                 img.resize(width = 125, height = 125)
                 program.img = img.execute_transforms(output_encoding=images.PNG)
             program.put()
+            memcache.set("program: %s" % hash, program)
     else:
         hash = ""
     
