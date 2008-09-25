@@ -36,6 +36,9 @@ class Papert(webapp.RequestHandler):
         if program == "not found":
             program = None
 
+        if program is None:
+            self.redirect('/')
+
     if program and extra == ".png":
         self.response.headers['Content-Type'] = 'image/png'
         self.response.headers['Cache-Control'] = 'max-age:604800'
