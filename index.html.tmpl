@@ -128,7 +128,23 @@ bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygot
         
 </div>
 </form>
-<div id="footer"><a href="http://code.google.com/p/papert">papert on google code</a></div>
+
+<div id="footer">
+<span style="float: left; margin-left: 20px; margin-right: auto;">
+Recent Programs
+</span>
+<span style="float: right;margin-left: auto; margin-right: 20px;">
+<a href="http://code.google.com/p/papert">papert on google code</a>
+</span>
+&nbsp;
+</div>
+<div id="recent">
+<ul>
+{% for item in recent %}
+<li><img src="/{{item|escape}}.png"/></li>
+{% endfor %}
+</ul>
+</div>
 <div id="notes">
 <pre>
 Quick reference logo guide:

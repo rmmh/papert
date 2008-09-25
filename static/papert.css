@@ -12,7 +12,10 @@ body{
     float: left;
     width:430px;
     margin-left: 520px;
+    padding-left 10px;
     background: #93B9FF;
+    border-style: solid;
+    border-color: #93B9FF;
     height: 560px; /* I hate CSS */
 }
 
@@ -47,6 +50,8 @@ body{
     margin-left: -950px;
     height: 560px;
     background: #5370C0;
+    border-style: solid;
+    border-color: #5370C0;
 }
 
 #canvas {
@@ -64,13 +69,37 @@ body{
     clear: left;
     width: 100%;
     background: black;
-    color: #FFF;
     text-align: center;
     padding: 4px 0;
+    border-style: solid;
+    border-color: black;
+}
+
+#recent ul {
+    list-style-type:none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+#recent ul li {
+    padding: 20px;
+    display: inline; 
+}
+
+#recent{
+    clear: left;
+    width: 100%;
+    background: white;
+    color: #FFF;
+    padding: 4px 0;
+    text-align: center;
+    border-style: solid;
+    border-color: black;
 }
 
 #footer a{
-color: #FFFF80;
+    color: #FFFF80;
 }
 
 .inner{

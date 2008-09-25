@@ -56,6 +56,12 @@ class Papert(webapp.RequestHandler):
             values['code'] = program.code
             values['hash'] = hash
     
+        recent = LogoProgram.all().order("-date").fetch(5)
+        values['recent'] = []
+        
+        for p in recent:
+            values['recent'].append(p.hash)
+        
         page = os.path.join(os.path.dirname(__file__), 'index.html.tmpl')
         self.response.out.write(template.render(page, values))
 
