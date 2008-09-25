@@ -141,7 +141,7 @@ Recent Programs
 <div id="recent">
 <ul>
 {% for item in recent %}
-<li><img src="/{{item|escape}}.png"/></li>
+<li><a href="/{{item|escape}}"><img src="/{{item|escape}}.png"/></a></li>
 {% endfor %}
 </ul>
 </div>
