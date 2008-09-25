@@ -89,6 +89,7 @@ body{
 
 #recent ul li a { text-decoration: none; }
 
+#recent ul li a img { border: none; }
 #recent{
     clear: left;
     width: 100%;
