@@ -2,7 +2,6 @@
 import os
 import base64
 import sha
-import re
 
 from google.appengine.ext.webapp import template
 from google.appengine.ext import webapp
@@ -17,14 +16,17 @@ class LogoProgram(db.Model):
     date = db.DateTimeProperty(auto_now_add=True)
     hash = db.StringProperty()
 
-hash_re = re.compile(r"/([A-Za-z0-9_-]*)(.*)")
-
 class Papert(webapp.RequestHandler):
   def get(self):
-    hash, extra = hash_re.match(self.request.path).groups()
-   
+    hash = self.request.path[1:9] #this assumes that hashes are always 8 chars
+    extra = self.request.path[9:]
+
     if extra == ".png" and hash == self.request.headers.get('If-None-Match'):
         self.response.set_status(304)
+        return
+
+    if extra not in ('', '.png'):
+        self.redirect('/')
         return
 
     program = None
@@ -55,13 +57,15 @@ class Papert(webapp.RequestHandler):
         if program:
             values['code'] = program.code
             values['hash'] = hash
-    
-        recent = LogoProgram.all().order("-date").fetch(5)
-        values['recent'] = []
         
-        for p in recent:
-            values['recent'].append(p.hash)
-        
+        recent = memcache.get("recent")
+        if recent is None:
+            recent = [program.hash for program in
+                      LogoProgram.all().order('-date').fetch(5)]
+            memcache.set("recent", recent)
+
+        values['recent'] = recent
+
         page = os.path.join(os.path.dirname(__file__), 'index.html.tmpl')
         self.response.out.write(template.render(page, values))
 
@@ -77,10 +81,11 @@ class Papert(webapp.RequestHandler):
             if img:
                 img = base64.b64decode(img)
                 img = images.Image(img)
-                img.resize(width = 125, height = 125)
-                program.img = img.execute_transforms(output_encoding=images.PNG)
+                img.resize(125, 125)
+                program.img = img.execute_transforms()
             program.put()
             memcache.set("program: %s" % hash, program)
+            memcache.delete("recent")
     else:
         hash = ""
     
