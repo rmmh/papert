@@ -217,6 +217,47 @@ DIFFERENCE 1 2          DIVIDE 1 2
 1 % 2
 MOD 1 2
 
+RANDOM n        Return a integer in [0,n)
+RAND n
+
+RERANDOM s      Set the random seed value
+SRAND s
+
+
+INT n
+ROUND n
+POWER e m
+EXP n
+LN n
+LOG10 n
+
+
+
+SIN, COS
+RADSIN,RADCOS
+
+ARCTAN
+RADARCTAN
+
+
+
+List Operators (experimental):
+These functions may break silently at the moment.
+
+FIRST, HEAD             Return the first item in a list
+BUTFIRST, TAIL          Return the everything but the first item in a list
+LAST                    Return the last item in a list
+BUTLAST                 Return everything but the last item in a list
+
+FPUT item list  Return a new list with item at the front
+LPUT item list  Return a new list with item at the back
+
+ITEM index list                 Retrieve the indexed item
+SETITEM index list value        Set the indexed item
+
+EMPTY? list     Return true if list is empty
+EMPTYP list 
+
 Logical and Comparison:
 
 1 = 1
