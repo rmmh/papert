@@ -42,7 +42,7 @@ Turtle.prototype.penwidth = function(w) {
 }
 
 Turtle.prototype.color = function (args) {
-        this.c.strokeStyle = "rgb("+args[0]+","+args[1]+","+args[2]+")";
+        this.c.strokeStyle = "rgb("+parseInt(args[0])+","+parseInt(args[1])+","+parseInt(args[2])+")";
 }
 
 Turtle.prototype.arc = function (radius, angle) {
