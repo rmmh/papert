@@ -14,11 +14,12 @@ var turtle = null;
 var logo = null;
 var canvas;
 var form;
+var textOutput;
 
-function init (canvas_id,form_id,oldcode_id) {
+function init (canvas_id,form_id,oldcode_id,textoutput_id) {
     canvas = document.getElementById(canvas_id);
     form = document.getElementById(form_id);
-    
+    textOutput = document.getElementById(textoutput_id);
     
     // I hate opera, I hate firefox.
     canvas.style.width = 500;
@@ -37,6 +38,7 @@ function setup () {
     fast = 5;
     turtle = new DelayTurtle(canvas,fast,false);
     logo.setTurtle(turtle);
+	logo.setTextOutput(textOutput);
 }
 
 
@@ -73,11 +75,12 @@ function clearcanvas() {
     var ctx = canvas.getContext('2d');
     ctx.fillStyle = "rgb(255,255,255)";
     ctx.fillRect(0, 0, 500, 500);
+	textOutput.innerHTML = "";
 }
 </script>
 
 </head>
-<body onload="init('canvas','input','oldcode'); clearcanvas(); run(5,false);">
+<body onload="init('canvas','input','oldcode', 'textOutput'); clearcanvas(); run(5,false);">
     
 <div id="main">
 <form id="input" action="/" method="post" onSubmit="this.img.value = canvas.toDataURL().replace('data:image/png;base64,','')">
@@ -115,6 +118,7 @@ bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygot
 
 <div id="left">
     <div class="inner">
+		<div id="textOutput"></div>
         <canvas id="canvas">
     Your browser doesn't support canvas tags. Please upgrade to a recent version of Firefox or Opera.
     </canvas>

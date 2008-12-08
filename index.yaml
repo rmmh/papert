@@ -10,7 +10,7 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-# Used 9 times in query history.
+# Used once in query history.
 - kind: LogoProgram
   properties:
   - name: date

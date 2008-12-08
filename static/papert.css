@@ -58,6 +58,13 @@ body{
     margin: 10px 0 10px 0;
 }
 
+#textOutput {
+	margin: 10px 0 10px 0;
+	position: absolute;
+	font-size: 20px;
+	background-color: transparent;
+}
+
 #notes {
     clear: left;
     width: 100%;
