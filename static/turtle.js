@@ -124,16 +124,21 @@ Turtle.prototype.radians = function() {
     return this.angle / 180 * Math.PI;
 }
 
-Turtle.prototype.clearscreen = function() {
+Turtle.prototype.clean = function() {
     old = this.c.fillStyle
     this.c.fillStyle = "rgb(255,255,255)";
     this.c.fillRect(0,0,this.max_x,this.max_y);
     this.c.fillStyle = old
 }
 
+Turtle.prototype.clearscreen = function() {
+    this.clean();
+    this.home();
+}
+
 
 Turtle.prototype.reset = function() {
-    this.clearscreen();
+    this.clean();
     this.setup();
 }
 
@@ -216,6 +221,7 @@ DelayTurtle.prototype.backward = function(d) { this.forward(-d)};
 DelayTurtle.prototype.right = function() { this.addCommand(this.turtle.right,arguments)};
 DelayTurtle.prototype.left = function() { this.addCommand(this.turtle.left,arguments)};
 DelayTurtle.prototype.reset = function() { this.addCommand(this.turtle.reset,arguments)};
+DelayTurtle.prototype.clean = function() { this.addCommand(this.turtle.clean,arguments)};
 DelayTurtle.prototype.clearscreen = function() { this.addCommand(this.turtle.clearscreen,arguments)};
 DelayTurtle.prototype.penup = function() { this.addCommand(this.turtle.penup,arguments)};
 DelayTurtle.prototype.pendown = function() { this.addCommand(this.turtle.pendown,arguments)};

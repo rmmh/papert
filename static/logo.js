@@ -181,6 +181,7 @@ Logo.prototype.setup = function () {
     });
     
     this.addTurtleCommand('clearscreen',0,['cs','clear']);
+    this.addTurtleCommand('clean',0,null);
     
     this.addTurtleCommand('reset',0,null);
 
