@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>papert: logo in your browser</title>
+<link rel="icon" href="/favicon.ico" />
+<link rel="stylesheet" type="text/css" href="/static/papert.css" />
+<script type="text/javascript" src="/static/turtle.js"></script>
+<script type="text/javascript" src="/static/parser.js"></script>
+<script type="text/javascript" src="/static/logo.js"></script>
+<script type="text/javascript">
+var turtle = null;
+var logo = null;
+var canvas;
+var form;
+var textOutput;
+
+function init (canvas_id,form_id,oldcode_id,textoutput_id) {
+    canvas = document.getElementById(canvas_id);
+    form = document.getElementById(form_id);
+    textOutput = document.getElementById(textoutput_id);
+    
+    // I hate opera, I hate firefox.
+    canvas.style.width = 500;
+    canvas.width = 500;
+    
+    canvas.style.height = 500;
+    canvas.height = 500;
+    
+    oldcode = document.getElementById(oldcode_id);
+    setup();
+}
+
+function setup () {
+    logo = new Logo()
+    
+    fast = 5;
+    turtle = new DelayTurtle(canvas,fast,false);
+    logo.setTurtle(turtle);
+	logo.setTextOutput(textOutput);
+}
+
+
+function run (speed,drawbits) {
+        turtle.stop();
+        if (speed != fast) {
+            fast = speed;
+            var newturtle = null;
+/*          newturtle = new Turtle(canvas);
+*/
+            newturtle = new DelayTurtle(canvas,fast,drawbits);
+            logo.setTurtle(newturtle);
+            turtle = newturtle;
+        }
+        var code = form.code.value;
+        oldcode.innerHTML +="\n"+code
+        form.code.value = ""
+
+        
+        var out = logo.run(code);
+                
+        if (out && out.type == "error") {
+            alert(out.data);
+            setup();
+        }
+}
+
+function stop(){
+    turtle.stop();
+}
+
+function clearcanvas() {
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = "rgb(255,255,255)";
+    ctx.fillRect(0, 0, 500, 500);
+	textOutput.innerHTML = "";
+}
+function change(code) {
+    if (code.match(/\n$/)) {
+        run(15,true);
+    } 
+}
+</script>
+
+</head>
+<body onload="init('canvas','input','oldcode', 'textOutput'); clearcanvas(); run(5,false);">
+    
+<div id="main">
+<form id="input" action="/" method="post" onSubmit="this.img.value = canvas.toDataURL().replace('data:image/png;base64,','')">
+
+<div id="content">
+    <div class="inner">
+        <div id="oldcode">&nbsp;</div>
+        <div>
+        <textarea onkeyup="return change(this.value);" name="code" id="code" rows="80" cols="20"></textarea>
+        </div>
+        <div style="margin: 5px;">
+        <input type="button" onClick="run(25,true);" value="run slowly" />
+        <input type="button" onClick="run(5,false);" value="run normally" style="font-weight: bold;"/>
+        <input type="button" onClick="run(1,false);" value="run fast" />
+        <input type="button" onClick="stop();" value="stop program" />
+        <input type="hidden" name="img" />
+        </div>
+
+    </div>
+</div>
+
+<div id="left">
+    <div class="inner">
+		<div id="textOutput"></div>
+        <canvas id="canvas">
+    Your browser doesn't support canvas tags. Please upgrade to a recent version of Firefox or Opera.
+    </canvas>
+    <span style="float: left; margin-right: auto;">
+    <input type="submit" value="share this program" />
+    <input type="button" onClick="document.location.href = canvas.toDataURL().replace('image/png', 'image/octet-stream')" value="save as png" />
+    </span>
+     <span style="float: right;margin-left: auto; margin-right: 20px;">
+     <input type="button" onClick="clearcanvas();" value="clear" />
+     </span>
+</div>
+        
+</div>
+</form>
+
+
+</div>
+</body>
+</html>
