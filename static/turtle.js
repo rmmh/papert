@@ -1,20 +1,34 @@
 // $Id$
 
-function Turtle (canvas) {
+function Turtle (canvas, turtle) {
  
     if (canvas && canvas.getContext) {
         this.wait = 100;
     
         this.c = canvas.getContext('2d');
+
+        this._top = canvas.offsetTop;
+        this._left = canvas.offsetLeft;
         
+
         this.max_x = canvas.width;
         this.max_y = canvas.height;
-        
+
         this.c.lineCap = "round";
-        
+        this.turtle = turtle;
+        this.sprite = document.getElementById('sprite').getSVGDocument();
+        this.sprite = this.sprite.getElementById('sprite');
         this.setup();
     }
 }
+
+Turtle.prototype.update = function() {
+    this.turtle.style.left = parseInt(this._left + this.x -10) + "px";
+    this.turtle.style.top = parseInt(this._top + this.y-20) + "px";
+    this.sprite.setAttribute('transform','rotate('+(this.angle)+' 10 10)');
+    //this.turtle.style.top =;
+}
+
 
 Turtle.prototype.start = function(){};
 Turtle.prototype.stop = function(){};
@@ -23,18 +37,22 @@ Turtle.prototype.finish = function(){};
 Turtle.prototype.setxy = function(x,y) {
     this.x = x;
     this.y = y;
+    this.update();
 }
 
 Turtle.prototype.setx = function(x) {
     this.x = x;
+    this.update();
 }
 
 Turtle.prototype.sety = function(x,y) {
     this.x = x;
+    this.update();
 }
 
 Turtle.prototype.setheading = function(h) {
-    this.angle = (270+h) % 360
+    this.angle = (270+h) % 360;
+    this.update();
 }
 
 Turtle.prototype.penwidth = function(w) {
@@ -93,6 +111,7 @@ Turtle.prototype.forward = function (d) {
     
     this.x = newx;
     this.y = newy;
+    this.update();
 }
 
 Turtle.prototype.backward = function (d) {
@@ -102,6 +121,7 @@ Turtle.prototype.backward = function (d) {
 
 Turtle.prototype.right = function(angle) {
     this.angle = (this.angle + angle) % 360;
+    this.update();
 }
 
 
@@ -128,7 +148,7 @@ Turtle.prototype.clean = function() {
     old = this.c.fillStyle
     this.c.fillStyle = "rgb(255,255,255)";
     this.c.fillRect(0,0,this.max_x,this.max_y);
-    this.c.fillStyle = old
+    this.c.fillStyle = old;
 }
 
 Turtle.prototype.clearscreen = function() {
@@ -146,6 +166,7 @@ Turtle.prototype.home = function() {
     this.x = this.max_x/2;
     this.y = this.max_y/2;
     this.angle = 270;
+    this.update();
 }
 
 Turtle.prototype.setup = function() {
@@ -166,8 +187,8 @@ DelayCommand.prototype.call = function (that) {
 }
 
 
-function DelayTurtle (canvas, speed, draw_bits) {
-    this.turtle = new Turtle(canvas);
+function DelayTurtle (canvas, sprite, speed, draw_bits) {
+    this.turtle = new Turtle(canvas, sprite);
     this.pipeline = null;
     this.active = false;
     this.halt = false;

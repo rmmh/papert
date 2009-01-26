@@ -12,7 +12,7 @@ body{
     float: left;
     width:430px;
     margin-left: 520px;
-    padding-left 10px;
+    padding-left:10px;
     background: #93B9FF;
     border-style: solid;
     border-color: #93B9FF;
@@ -65,6 +65,14 @@ body{
 	background-color: transparent;
 }
 
+#turtle  {
+	margin: 10px 0 10px 0;
+	position: absolute;
+    width: 15px;
+    height: 15px;
+	font-size: 20px;
+	background-color: transparent;
+}
 #notes {
     clear: left;
     width: 100%;

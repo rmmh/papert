@@ -14,13 +14,15 @@ var turtle = null;
 var logo = null;
 var canvas;
 var form;
+var sprite;
 var textOutput;
 
-function init (canvas_id,form_id,oldcode_id,textoutput_id) {
+function init (canvas_id,turtle_id,form_id,oldcode_id,textoutput_id) {
     canvas = document.getElementById(canvas_id);
     form = document.getElementById(form_id);
     textOutput = document.getElementById(textoutput_id);
-    
+    sprite = document.getElementById(turtle_id)
+
     // I hate opera, I hate firefox.
     canvas.style.width = 500;
     canvas.width = 500;
@@ -36,7 +38,7 @@ function setup () {
     logo = new Logo()
     
     fast = 5;
-    turtle = new DelayTurtle(canvas,fast,false);
+    turtle = new DelayTurtle(canvas,sprite,fast,false);
     logo.setTurtle(turtle);
 	logo.setTextOutput(textOutput);
 }
@@ -49,7 +51,7 @@ function run (speed,drawbits) {
             var newturtle = null;
 /*          newturtle = new Turtle(canvas);
 */
-            newturtle = new DelayTurtle(canvas,fast,drawbits);
+            newturtle = new DelayTurtle(canvas,sprite,fast,drawbits);
             logo.setTurtle(newturtle);
             turtle = newturtle;
         }
@@ -80,7 +82,7 @@ function clearcanvas() {
 </script>
 
 </head>
-<body onload="init('canvas','input','oldcode', 'textOutput'); clearcanvas(); run(5,false);">
+<body onload="init('canvas','turtle','input','oldcode', 'textOutput'); clearcanvas(); run(5,false);">
     
 <div id="main">
 <form id="input" action="/" method="post" onSubmit="this.img.value = canvas.toDataURL().replace('data:image/png;base64,','')">
@@ -119,6 +121,9 @@ bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygot
 <div id="left">
     <div class="inner">
 		<div id="textOutput"></div>
+        <div id="turtle">
+        <embed id='sprite' src="/static/turtle.svg"/>
+        </div>
         <canvas id="canvas">
     Your browser doesn't support canvas tags. Please upgrade to a recent version of Firefox or Opera.
     </canvas>
