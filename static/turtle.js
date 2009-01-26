@@ -18,15 +18,31 @@ function Turtle (canvas, turtle) {
         this.turtle = turtle;
         this.sprite = document.getElementById('sprite').getSVGDocument();
         this.sprite = this.sprite.getElementById('sprite');
+        this.visible = true;
         this.setup();
     }
 }
 
+Turtle.prototype.hideturtle = function() {
+    this.visible = false;
+    this.update();
+}
+
+Turtle.prototype.showturtle = function() {
+    this.visible = true;
+    this.update();
+}
+
+
 Turtle.prototype.update = function() {
-    this.turtle.style.left = parseInt(this._left + this.x -10) + "px";
-    this.turtle.style.top = parseInt(this._top + this.y-20) + "px";
-    this.sprite.setAttribute('transform','rotate('+(this.angle)+' 10 10)');
-    //this.turtle.style.top =;
+    if (this.visible && this.x >=0 && this.y >= 0 && this.x <= this.max_x && this.y <= this.max_y) {
+        this.turtle.style.left = parseInt(this._left + this.x -10) + "px";
+        this.turtle.style.top = parseInt(this._top + this.y-20) + "px";
+        this.sprite.setAttribute('transform','rotate('+(this.angle)+' 10 10)');
+    } else {
+        this.turtle.style.left = "-10px";
+        this.turtle.style.top = "-10px";
+    }   
 }
 
 
@@ -239,6 +255,8 @@ DelayTurtle.prototype.forward = function(d) {
 };
 DelayTurtle.prototype.backward = function(d) { this.forward(-d)};
 
+DelayTurtle.prototype.showturtle = function() { this.addCommand(this.turtle.showturtle,arguments)};
+DelayTurtle.prototype.hideturtle = function() { this.addCommand(this.turtle.hideturtle,arguments)};
 DelayTurtle.prototype.right = function() { this.addCommand(this.turtle.right,arguments)};
 DelayTurtle.prototype.left = function() { this.addCommand(this.turtle.left,arguments)};
 DelayTurtle.prototype.reset = function() { this.addCommand(this.turtle.reset,arguments)};

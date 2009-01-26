@@ -36,6 +36,7 @@ body{
     margin-right: 10px;
     height: 200px;
     width:100%;
+    z-index: 10;
 }
 
 
@@ -67,9 +68,9 @@ body{
 
 #turtle  {
 	margin: 10px 0 10px 0;
+    height: 20px;
+    width: 20px;
 	position: absolute;
-    width: 15px;
-    height: 15px;
 	font-size: 20px;
 	background-color: transparent;
 }

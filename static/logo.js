@@ -180,6 +180,9 @@ Logo.prototype.setup = function () {
         this.turtle.penwidth(a[0]);
     });
     
+    this.addTurtleCommand('hideturtle',0,['ht']);
+    this.addTurtleCommand('showturtle',0,['st']);
+
     this.addTurtleCommand('clearscreen',0,['cs','clear']);
     this.addTurtleCommand('clean',0,null);
     
