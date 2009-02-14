@@ -29,6 +29,8 @@ function Logo () {
 
     this.repcount = -1;
     this.setup();
+    this.depth = 0;
+    this.maxdepth = 200;
 }
 
 Logo.prototype.random = function () {
@@ -577,19 +579,32 @@ Logo.prototype.eval = function (code) {
                 newvalues.set(name,value);
 
             }
+            // running function
             
+            if (this.depth > this.maxdepth) {
+                return new Token('error', 'too much recursion');
+            }
+
             if (last.type == "wrd" && last.data == code.data) {
                 
                 var par = this.values;
                 
                 var tail = f.code.pop();
+                rec_depth = this.depth;
                 while (1) { // revursive
+                    if (this.depth > this.maxdepth) {
+                        this.depth = rec_depth;
+                        return new Token('error', 'too much recursion');
+                    }
+                    this.depth++;
+            
                     this.values = newvalues;
                     var result = this.eval_list(f.code);
                     
                     if (result && (result.type == "stop" || result.type == "error")) {
                         this.values = par; // restore the original stack
                         f.code.push(tail); // restore the original tail.
+                        this.depth=rec_depth;
                         return result.data;
                     };
                     
@@ -603,16 +618,15 @@ Logo.prototype.eval = function (code) {
     
                         //alert("rec: "+code.data+" setting: "+name +":" +value);
                         newvalues.set(name,value);
-    
                     }
             
                 }
             } else {
                 this.values = newvalues;
-         
+                this.depth++; 
                 var result = this.eval_list(f.code);
                 //alert(result);
-                
+                this.depth--;
                 if (result && result.type == "stop") { result = result.data };
 
                 this.values = this.values.par;

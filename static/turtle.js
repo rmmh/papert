@@ -192,6 +192,8 @@ Turtle.prototype.setup = function() {
     this.pen = true;
 }
 
+Turtle.prototype.paint = function () {}
+
 function DelayCommand (that,fun,args) {
     this.that = that;
     this.fun = fun;
