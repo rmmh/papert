@@ -30,7 +30,8 @@ class Papert(webapp.RequestHandler):
             self.redirect('/')
             return
 
-        browse_date = self.request.get("older")
+        older = self.request.get("older")
+        newer = self.request.get("newer")
 
         program = None
 
@@ -62,30 +63,31 @@ class Papert(webapp.RequestHandler):
                 values['hash'] = hash
         
        
-            if browse_date:
-                    browse_date = datetime.datetime.strptime(browse_date,"%Y-%m-%dT%H:%M:%S")
-                    recent = LogoProgram.all().filter('date <', browse_date).order('-date').fetch(5)
-                    if recent:
-                        last_date = recent[-1].date
+            if older or newer:
+                    if older:
+                        browse_date = datetime.datetime.strptime(older,"%Y-%m-%dT%H:%M:%S")
+                        recent = LogoProgram.all().filter('date <', browse_date).order('-date').fetch(5)
                     else:
-                        last_date = None
-                    recent = [program.hash for program in recent]
+                        browse_date = datetime.datetime.strptime(newer,"%Y-%m-%dT%H:%M:%S")
+                        recent = LogoProgram.all().filter('date >', browse_date).order('date').fetch(5)
+                        if recent:
+                            recent.reverse()
+                    if recent:
+                        values['recent'] = [program.hash for program in recent]
+                        values['last_date'] = recent[-1].date.strftime("%Y-%m-%dT%H:%M:%S")
+                        values['next_date'] = recent[0].date.strftime("%Y-%m-%dT%H:%M:%S")
             else:
                 recent = memcache.get("recent")
                 last_date = memcache.get("last_date")
                 if recent is None or last_date is None:
                     recent = LogoProgram.all().order('-date').fetch(5)
                     if recent:
-                        last_date = recent[-1].date
-                    else:
-                        last_date = None
-                    recent = [program.hash for program in recent]
-                    memcache.set("recent", recent)
-                    memcache.set("last_date", last_date)
-            if recent:
-                values['recent'] = recent
-            if last_date:
-                values['last_date'] = last_date.strftime("%Y-%m-%dT%H:%M:%S")
+                        last_date = recent[-1].date.strftime("%Y-%m-%dT%H:%M:%S")
+                        recent = [program.hash for program in recent]
+                        memcache.set("recent", recent)
+                        memcache.set("last_date", last_date)
+                        values['recent'] =  recent
+                        values['last_date'] =  last_date
 
             page = os.path.join(os.path.dirname(__file__), 'index.html.tmpl')
             self.response.out.write(template.render(page, values))

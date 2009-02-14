@@ -99,8 +99,9 @@ body{
 }
 
 #recent ul li {
-    padding: 20px;
+    padding: 10px;
     display: inline; 
+    vertical-align: middle;
 }
 
 #recent ul li a { text-decoration: none; }

@@ -150,12 +150,16 @@ this is free software, and
 &nbsp;
 </div>
 <div id="recent">
+<a name="recent"></a>
 <ul>
+{% if next_date %}
+<li><a href="?newer={{next_date|escape}}#recent">&lt;</li>
+{% endif %}
 {% for item in recent %}
 <li><a href="/{{item|escape}}"><img src="/{{item|escape}}.png" alt="" /></a></li>
 {% endfor %}
 {% if last_date %}
-<li><a href="?older={{last_date|escape}}">older</li>
+<li><a href="?older={{last_date|escape}}#recent">&gt;</li>
 {% endif %}
 </ul>
 </div>
