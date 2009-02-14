@@ -63,9 +63,17 @@ function run (speed,drawbits) {
         var out = logo.run(code);
                 
         if (out && out.type == "error") {
-            alert(out.data);
-            setup();
+            oldcode.innerHTML +="\nerror: "+out.data;
+            logo.t = new Tokenizer();
         }
+
+         oldcode.scrollTop = oldcode.scrollHeight;
+
+         if (oldcode.createTextRange) {
+             var range = oldcode.createTextRange();
+             range.collapse(false);
+             range.select();i
+         }
 }
 
 function stop(){
