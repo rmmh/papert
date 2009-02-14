@@ -80,7 +80,29 @@ function clearcanvas() {
 }
 function change(code) {
     if (code.match(/\n$/)) {
-        run(15,true);
+        tos = code.match(/\bto\b/gi);
+        if (tos) { tos = tos.length } else {tos = 0}
+        ends = code.match(/\bend\b/gi);
+        if (ends) { ends = ends.length } else {ends = 0}
+        if (tos == ends) { 
+
+            tos = code.match(/\[/g);
+            if (tos) { tos = tos.length } else {tos = 0}
+            ends = code.match(/\]/g);
+            if (ends) { ends = ends.length } else {ends = 0}
+
+            if (tos == ends) { 
+                tos = code.match(/\(/g);
+                if (tos) { tos = tos.length } else {tos = 0}
+                ends = code.match(/\)/g);
+                if (ends) { ends = ends.length } else {ends = 0}
+                
+                if (tos == ends) { 
+
+                    run(15,true);
+                }
+            }
+        }
     } 
 }
 </script>
