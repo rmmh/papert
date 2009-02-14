@@ -2,6 +2,7 @@
 import os
 import base64
 import sha
+import datetime 
 
 from google.appengine.ext.webapp import template
 from google.appengine.ext import webapp
@@ -62,7 +63,8 @@ class Papert(webapp.RequestHandler):
         
        
             if browse_date:
-                    recent = LogoProgram.all().filter('date =', browse_date).order('-date').fetch(5)
+                    browse_date = datetime.datetime.strptime(browse_date,"%Y-%m-%dT%H:%M:%S")
+                    recent = LogoProgram.all().filter('date <', browse_date).order('-date').fetch(5)
                     if recent:
                         last_date = recent[-1].date
                     else:
@@ -83,7 +85,7 @@ class Papert(webapp.RequestHandler):
             if recent:
                 values['recent'] = recent
             if last_date:
-                values['last_date'] = last_date
+                values['last_date'] = last_date.strftime("%Y-%m-%dT%H:%M:%S")
 
             page = os.path.join(os.path.dirname(__file__), 'index.html.tmpl')
             self.response.out.write(template.render(page, values))
