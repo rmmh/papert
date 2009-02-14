@@ -29,6 +29,8 @@ class Papert(webapp.RequestHandler):
             self.redirect('/')
             return
 
+        browse_date = self.request.get("older")
+
         program = None
 
         if hash:
@@ -58,13 +60,30 @@ class Papert(webapp.RequestHandler):
                 values['code'] = program.code
                 values['hash'] = hash
         
-            recent = memcache.get("recent")
-            if recent is None:
-                recent = [program.hash for program in
-                          LogoProgram.all().order('-date').fetch(5)]
-                memcache.set("recent", recent)
-
-            values['recent'] = recent
+       
+            if browse_date:
+                    recent = LogoProgram.all().filter('date =', browse_date).order('-date').fetch(5)
+                    if recent:
+                        last_date = recent[-1].date
+                    else:
+                        last_date = None
+                    recent = [program.hash for program in recent]
+            else:
+                recent = memcache.get("recent")
+                last_date = memcache.get("last_date")
+                if recent is None or last_date is None:
+                    recent = LogoProgram.all().order('-date').fetch(5)
+                    if recent:
+                        last_date = recent[-1].date
+                    else:
+                        last_date = None
+                    recent = [program.hash for program in recent]
+                    memcache.set("recent", recent)
+                    memcache.set("last_date", last_date)
+            if recent:
+                values['recent'] = recent
+            if last_date:
+                values['last_date'] = last_date
 
             page = os.path.join(os.path.dirname(__file__), 'index.html.tmpl')
             self.response.out.write(template.render(page, values))

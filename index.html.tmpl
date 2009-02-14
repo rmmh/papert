@@ -86,11 +86,11 @@ function clearcanvas() {
     
 <div id="main">
 <form id="input" action="/" method="post" onSubmit="this.img.value = canvas.toDataURL().replace('data:image/png;base64,','')">
-<div id="top"><div class="inner"><h1>papert &#8213; logo in your browser</h1>
+<div id="top"><div class="inner"><h1>papert&#8213;logo in your browser</h1>
 <h2>
 examples:
-<a href="/_REo_2F2">koch snowflake</a> |
-<a href="/dZ1f62XY">hilbert curve</a> | 
+<a href="/_REo_2F2">koch snowflake</a>,
+<a href="/dZ1f62XY">hilbert curve</a>, 
 <a href="/8kpcBaQu">spiral</a>
 </h2>
 {% if hash %}
@@ -140,11 +140,12 @@ bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygot
 </form>
 
 <div id="footer">
-<span style="float: left; margin-left: 20px; margin-right: auto;">
+<span style="float: left; margin-left: 20px; margin-right: auto; color: white;">
 Recent Programs
 </span>
-<span style="float: right;margin-left: auto; margin-right: 20px;">
-<a href="http://code.google.com/p/papert">papert on google code</a>
+<span style="float: right;margin-left: auto; margin-right: 20px; color: white;">
+this is free software, and 
+<a href="http://code.google.com/p/papert">papert is hosted on google code</a>
 </span>
 &nbsp;
 </div>
@@ -153,6 +154,9 @@ Recent Programs
 {% for item in recent %}
 <li><a href="/{{item|escape}}"><img src="/{{item|escape}}.png" alt="" /></a></li>
 {% endfor %}
+{% if last_date %}
+<li><a href="?older={{last_date|escape}}">older</li>
+{% endif %}
 </ul>
 </div>
 <div id="notes">
