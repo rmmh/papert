@@ -593,14 +593,16 @@ Logo.prototype.eval = function (code) {
                 rec_depth = this.depth;
                 while (1) { // revursive
                     if (this.depth > this.maxdepth) {
-                        this.depth = rec_depth;
+                        this.values = par; // restore the original stack
+                        f.code.push(tail); // restore the original tail.
+                        this.depth=rec_depth;
                         return new Token('error', 'too much recursion');
                     }
+
                     this.depth++;
-            
                     this.values = newvalues;
                     var result = this.eval_list(f.code);
-                    
+
                     if (result && (result.type == "stop" || result.type == "error")) {
                         this.values = par; // restore the original stack
                         f.code.push(tail); // restore the original tail.
