@@ -86,8 +86,9 @@ class Papert(webapp.RequestHandler):
                         recent = [program.hash for program in recent]
                         memcache.set("recent_scripts", recent)
                         memcache.set("last_script_date", last_date)
-                        values['recent'] =  recent
-                        values['last_date'] =  last_date
+                if recent and last_date:
+                    values['recent'] =  recent
+                    values['last_date'] =  last_date
 
             page = os.path.join(os.path.dirname(__file__), 'index.html.tmpl')
             self.response.out.write(template.render(page, values))
