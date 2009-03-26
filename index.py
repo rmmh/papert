@@ -77,15 +77,15 @@ class Papert(webapp.RequestHandler):
                         values['last_date'] = recent[-1].date.strftime("%Y-%m-%dT%H:%M:%S")
                         values['next_date'] = recent[0].date.strftime("%Y-%m-%dT%H:%M:%S")
             else:
-                recent = memcache.get("recent")
-                last_date = memcache.get("last_date")
+                recent = memcache.get("recent_scripts")
+                last_date = memcache.get("last_script_date")
                 if recent is None or last_date is None:
                     recent = LogoProgram.all().order('-date').fetch(5)
                     if recent:
                         last_date = recent[-1].date.strftime("%Y-%m-%dT%H:%M:%S")
                         recent = [program.hash for program in recent]
-                        memcache.set("recent", recent)
-                        memcache.set("last_date", last_date)
+                        memcache.set("recent_scripts", recent)
+                        memcache.set("last_script_date", last_date)
                         values['recent'] =  recent
                         values['last_date'] =  last_date
 
