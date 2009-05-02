@@ -170,6 +170,10 @@ Logo.prototype.setup = function () {
     this.addTurtleCommand('penup',0,['pu']);
     this.addTurtleCommand('pendown',0,['pd']);
     this.addTurtleCommand('home',0,null);
+    this.addTurtleCommand('undo',0,null);
+    this.addTurtleCommand('redo',0,null);
+    
+    
     
     this.addCommand('color',1,['colour'], function (a) { 
         if (a[0].length != 3 ) return new Token('error','When using color, pass it a list like [r g b], not '+a[0])

@@ -6,6 +6,7 @@ function Turtle (canvas, turtle) {
         this.wait = 100;
     
         this.c = canvas.getContext('2d');
+        this.canvas = canvas
 
         this._top = canvas.offsetTop;
         this._left = canvas.offsetLeft;
@@ -19,9 +20,59 @@ function Turtle (canvas, turtle) {
         this.sprite = document.getElementById('sprite').getSVGDocument();
         this.sprite = this.sprite.getElementById('sprite');
         this.visible = true;
+        this.undobuffer = [];
+        this.redobuffer = [];
         this.setup();
     }
 }
+
+Turtle.prototype.savestate = function() {
+    if (this.undobuffer.length > 23) {
+        this.undobuffer.shift();
+    }
+    this.undobuffer.push(this.getstate());
+
+    this.redobuffer = [];
+}
+
+Turtle.prototype.getstate = function() {
+    img = this.c.getImageData(0,0,this.max_x,this.max_y);
+    return {"x":this.x,"y":this.y,"angle":this.angle,"img":img};
+}
+Turtle.prototype.setstate = function(state) {
+    this.x = state.x;
+    this.y = state.y;
+    this.angle = state.angle;
+    this.clean_();
+    this.c.putImageData(state.img,0,0);
+    this.update();
+
+}
+
+
+
+Turtle.prototype.undo = function() {
+    if (this.undobuffer.length > 0) {
+        prev = this.undobuffer.pop();
+        curr = this.getstate();
+        this.setstate(prev);
+        this.redobuffer.push(curr);
+    } else {
+        // Warning
+    }
+}   
+
+Turtle.prototype.redo = function() {
+    if (this.redobuffer.length > 0) {
+        next = this.redobuffer.pop();
+        curr = this.getstate();
+        this.setstate(next);
+        this.undobuffer.push(curr);
+    } else {
+        // Warning
+    }
+}   
+
 
 Turtle.prototype.hideturtle = function() {
     this.visible = false;
@@ -51,35 +102,49 @@ Turtle.prototype.stop = function(){};
 Turtle.prototype.finish = function(){};
 
 Turtle.prototype.setxy = function(x,y) {
+    this.savestate();
     this.x = x;
     this.y = y;
     this.update();
 }
 
 Turtle.prototype.setx = function(x) {
+    this.savestate();
     this.x = x;
     this.update();
 }
 
 Turtle.prototype.sety = function(x,y) {
+    this.savestate();
     this.x = x;
     this.update();
 }
 
 Turtle.prototype.setheading = function(h) {
+    this.savestate();
     this.angle = (270+h) % 360;
     this.update();
 }
 
 Turtle.prototype.penwidth = function(w) {
+    this.savestate();
+    this.penwidth_(w);
+}
+
+Turtle.prototype.penwidth_ = function(w) {;
     this.c.lineWidth=w;
 }
 
 Turtle.prototype.color = function (args) {
-        this.c.strokeStyle = "rgb("+parseInt(args[0])+","+parseInt(args[1])+","+parseInt(args[2])+")";
+    this.savestate();
+    this.color_(args)
+}
+Turtle.prototype.color_ = function (args) {
+    this.c.strokeStyle = "rgb("+parseInt(args[0])+","+parseInt(args[1])+","+parseInt(args[2])+")";
 }
 
 Turtle.prototype.arc = function (radius, angle) {
+    this.savestate();
     if (this.pen) {
         this.c.beginPath();
         this.c.arc(this.x,this.y, radius, this.radians(), ((this.angle+angle)%360)/180*Math.PI,false);
@@ -99,6 +164,7 @@ Turtle.prototype.arc_point = function (radius, angle) {
 
 
 Turtle.prototype.circle = function (radius) {
+    this.savestate();
     if (this.pen) {
         this.c.beginPath();
         this.c.arc(this.x,this.y, radius, 0, 2*Math.PI,false);
@@ -107,8 +173,12 @@ Turtle.prototype.circle = function (radius) {
   }
 }
 
-
 Turtle.prototype.forward = function (d) {
+    this.savestate();
+    this.crawl(d);
+}
+
+Turtle.prototype.crawl = function (d) {
     this.c.beginPath();
     
     this.c.moveTo(this.x,this.y);
@@ -136,22 +206,26 @@ Turtle.prototype.backward = function (d) {
 
 
 Turtle.prototype.right = function(angle) {
+    this.savestate();
     this.angle = (this.angle + angle) % 360;
     this.update();
 }
 
 
 Turtle.prototype.left = function(angle) {
+    this.savestate();
     this.right(-angle);
 }
 
 
 Turtle.prototype.penup = function() {
+    this.savestate();
     this.pen = false;
 }
 
 
 Turtle.prototype.pendown = function() {
+    this.savestate();
     this.pen = true;
 }
 
@@ -159,8 +233,11 @@ Turtle.prototype.pendown = function() {
 Turtle.prototype.radians = function() {
     return this.angle / 180 * Math.PI;
 }
-
 Turtle.prototype.clean = function() {
+    this.savestate();
+    this.clean_;
+}
+Turtle.prototype.clean_ = function() {
     old = this.c.fillStyle
     this.c.fillStyle = "rgb(255,255,255)";
     this.c.fillRect(0,0,this.max_x,this.max_y);
@@ -168,17 +245,25 @@ Turtle.prototype.clean = function() {
 }
 
 Turtle.prototype.clearscreen = function() {
-    this.clean();
-    this.home();
+    this.savestate();
+    this.clean_();
+    this.home_();
 }
 
 
 Turtle.prototype.reset = function() {
-    this.clean();
+    this.clean_();
     this.setup();
+    this.undobuffer = [];
+    this.redobuffer = [];
 }
 
-Turtle.prototype.home = function() {
+Turtle.prototype.home = function () {
+    this.savestate();
+    this.home_();
+}
+
+Turtle.prototype.home_ = function() {
     this.x = this.max_x/2;
     this.y = this.max_y/2;
     this.angle = 270;
@@ -186,9 +271,9 @@ Turtle.prototype.home = function() {
 }
 
 Turtle.prototype.setup = function() {
-    this.home();
-    this.penwidth(1);
-    this.color([0,0,0]);
+    this.home_();
+    this.penwidth_(1);
+    this.color_([0,0,0]);
     this.pen = true;
 }
 
@@ -248,8 +333,10 @@ DelayTurtle.prototype.forward = function(d) {
     if (this.drawbits) {
         var l = Math.abs(d);
         var s = l/d; 
+
+        this.savestate();
         for (var c = 0; c < l; c++ ) {
-            this.addCommand(this.turtle.forward,[s])
+            this.addCommand(this.turtle.crawl,[s])
         }
     } else {
         this.addCommand(this.turtle.forward,[d]);
@@ -268,10 +355,14 @@ DelayTurtle.prototype.penup = function() { this.addCommand(this.turtle.penup,arg
 DelayTurtle.prototype.pendown = function() { this.addCommand(this.turtle.pendown,arguments)};
 DelayTurtle.prototype.penwidth = function() { this.addCommand(this.turtle.penwidth,arguments)};
 DelayTurtle.prototype.color = function() { this.addCommand(this.turtle.color,arguments)};
+DelayTurtle.prototype.savestate = function() { this.addCommand(this.turtle.savestate,arguments)};
+DelayTurtle.prototype.redo = function() { this.addCommand(this.turtle.redo,arguments)};
+DelayTurtle.prototype.undo = function() { this.addCommand(this.turtle.undo,arguments)};
 
 DelayTurtle.prototype.arc = function(radius, angle) { 
     if (this.drawbits) {
         var end = (360+angle) % 360 ; 
+        this.savestate();
         for (var c = 0; c <= end; c++ ) {
             this.addCommand(this.turtle.arc_point,[radius,c])
         }
@@ -281,6 +372,7 @@ DelayTurtle.prototype.arc = function(radius, angle) {
 };
 DelayTurtle.prototype.circle = function(radius) {
     if (this.drawbits) {
+        this.savestate();
         for (var c = 0; c < 360; c++ ) {
             this.addCommand(this.turtle.arc_point,[radius,c])
         }
