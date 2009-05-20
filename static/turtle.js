@@ -27,26 +27,26 @@ function Turtle (canvas, turtle) {
 }
 
 Turtle.prototype.savestate = function() {
-    if (this.undobuffer.length > 23) {
-        this.undobuffer.shift();
-    }
-    this.undobuffer.push(this.getstate());
-
-    this.redobuffer = [];
+//    if (this.undobuffer.length > 23) {
+//        this.undobuffer.shift();
+//    }
+//    this.undobuffer.push(this.getstate());
+//
+//    this.redobuffer = [];
 }
 
 Turtle.prototype.getstate = function() {
-    img = this.c.getImageData(0,0,this.max_x,this.max_y);
-    return {"x":this.x,"y":this.y,"angle":this.angle,"img":img};
+//    img = this.c.getImageData(0,0,this.max_x,this.max_y);
+//    return {"x":this.x,"y":this.y,"angle":this.angle,"img":img};
 }
 Turtle.prototype.setstate = function(state) {
-    this.x = state.x;
-    this.y = state.y;
-    this.angle = state.angle;
-    this.clean_();
-    this.c.putImageData(state.img,0,0);
-    this.update();
-
+//    this.x = state.x;
+//    this.y = state.y;
+//    this.angle = state.angle;
+//    this.clean_();
+//    this.c.putImageData(state.img,0,0);
+//    this.update();
+//
 }
 
 
