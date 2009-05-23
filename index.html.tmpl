@@ -16,8 +16,21 @@ var canvas;
 var form;
 var sprite;
 var textOutput;
+var oldcode;
+var fast;
+var out;
+var DelayTurtle;
 
-function init (canvas_id,turtle_id,form_id,oldcode_id,textoutput_id) {
+function setup() {
+    logo = new Logo();
+    
+    fast = 5;
+    turtle = new DelayTurtle(canvas, sprite, fast, false);
+    logo.setTurtle(turtle);
+    logo.setTextOutput(textOutput);
+}
+
+function init(canvas_id, turtle_id, form_id, oldcode_id, textoutput_id) {
     canvas = document.getElementById(canvas_id);
     form = document.getElementById(form_id);
     textOutput = document.getElementById(textoutput_id);
@@ -34,42 +47,31 @@ function init (canvas_id,turtle_id,form_id,oldcode_id,textoutput_id) {
     setup();
 }
 
-function setup () {
-    logo = new Logo()
+function run(speed, drawbits) {
+    turtle.stop();
+    if (speed !== fast) {
+        fast = speed;
+        var newturtle = null;
+        // newturtle = new Turtle(canvas);
+  
+        newturtle = new DelayTurtle(canvas, sprite, fast, drawbits);
+        logo.setTurtle(newturtle);
+        turtle = newturtle;
+    }
+  
+    oldcode.innerHTML += "\n" + form.code.value;
+    //form.code.value = ""
+  
     
-    fast = 5;
-    turtle = new DelayTurtle(canvas,sprite,fast,false);
-    logo.setTurtle(turtle);
-	logo.setTextOutput(textOutput);
+    out = logo.run(form.code.value);
+            
+    if (out && out.type === "error") {
+        alert(out.data);
+        setup();
+    }
 }
 
-
-function run (speed,drawbits) {
-        turtle.stop();
-        if (speed != fast) {
-            fast = speed;
-            var newturtle = null;
-/*          newturtle = new Turtle(canvas);
-*/
-            newturtle = new DelayTurtle(canvas,sprite,fast,drawbits);
-            logo.setTurtle(newturtle);
-            turtle = newturtle;
-        }
-        var code = form.code.value;
-
-        oldcode.innerHTML +="\n"+code
-        //form.code.value = ""
-
-        
-        var out = logo.run(code);
-                
-        if (out && out.type == "error") {
-            alert(out.data);
-            setup();
-        }
-}
-
-function stop(){
+function stop() {
     turtle.stop();
 }
 
@@ -77,7 +79,7 @@ function clearcanvas() {
     var ctx = canvas.getContext('2d');
     ctx.fillStyle = "rgb(255,255,255)";
     ctx.fillRect(0, 0, 500, 500);
-	textOutput.innerHTML = "";
+    textOutput.innerHTML = "";
 }
 </script>
 
