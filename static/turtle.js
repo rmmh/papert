@@ -17,8 +17,7 @@ function Turtle (canvas, turtle) {
 
         this.c.lineCap = "round";
         this.turtle = turtle;
-        this.sprite = document.getElementById('sprite').getSVGDocument();
-        this.sprite = this.sprite.getElementById('sprite');
+        this.sprite = document.getElementById('sprite');
         this.visible = true;
         this.undobuffer = [];
         this.redobuffer = [];

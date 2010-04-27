@@ -77,8 +77,7 @@ body{
 #notes {
     clear: left;
     width: 100%;
-    padding: 4px 0;
-    margin-left: 100px;
+    height: 100%;
 }
 
 #footer{

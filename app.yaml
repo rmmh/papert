@@ -11,5 +11,9 @@ handlers:
   static_files: static/favicon.ico
   upload: static/favicon.ico
 
+- url: /help.txt
+  static_files: static/help.txt
+  upload: static/help.txt
+
 - url: /.*
   script: index.py
