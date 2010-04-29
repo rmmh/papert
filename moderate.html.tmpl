@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>papert: logo in your browser (MODERATE)</title>
+<link rel="icon" href="/favicon.ico" />
+</head>
+<body> 
+
+<a href="{{login_url}}">login</a><br>
+
+?filter_string=blahblah&amp;delete=1<br>
+
+<table border="1">
+{% for item in items %}
+<tr>
+<td>{{item.date}}</td>
+<td>{{item.hash}}</td>
+<td>{{item.code|escape}}</td>
+</tr>
+{% endfor %}
+</table>
+
+</body>
+</html>

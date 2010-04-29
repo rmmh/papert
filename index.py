@@ -1,7 +1,7 @@
 """$Id$"""
 import os
 import base64
-import sha
+import hashlib
 import datetime 
 
 from google.appengine.ext.webapp import template
@@ -64,31 +64,33 @@ class Papert(webapp.RequestHandler):
         
        
             if older or newer:
-                    if older:
-                        browse_date = datetime.datetime.strptime(older,"%Y-%m-%dT%H:%M:%S")
-                        recent = LogoProgram.all().filter('date <', browse_date).order('-date').fetch(5)
-                    else:
-                        browse_date = datetime.datetime.strptime(newer,"%Y-%m-%dT%H:%M:%S")
-                        recent = LogoProgram.all().filter('date >', browse_date).order('date').fetch(5)
-                        if recent:
-                            recent.reverse()
-                    if recent:
-                        values['recent'] = [program.hash for program in recent]
-                        values['last_date'] = recent[-1].date.strftime("%Y-%m-%dT%H:%M:%S")
-                        values['next_date'] = recent[0].date.strftime("%Y-%m-%dT%H:%M:%S")
+                if older:
+                    browse_date = datetime.datetime.strptime(older,"%Y-%m-%dT%H:%M:%S")
+                    recent = LogoProgram.all().filter('date <', browse_date).order('-date').fetch(5)
+                    values['older'] = older
+                elif newer:
+                    browse_date = datetime.datetime.strptime(newer,"%Y-%m-%dT%H:%M:%S")
+                    recent = LogoProgram.all().filter('date >', browse_date).order('date').fetch(5)
+                    recent.reverse()
+                    values['newer'] = newer
+                if recent:
+                    values['recent'] = [program.hash for program in recent]
+                    values['last_date'] = recent[-1].date.strftime("%Y-%m-%dT%H:%M:%S")
+                    values['next_date'] = recent[0].date.strftime("%Y-%m-%dT%H:%M:%S")
             else:
-                recent = memcache.get("recent_scripts")
-                last_date = memcache.get("last_script_date")
-                if recent is None or last_date is None:
+                recent = memcache.get("recent_progs")
+                last_date = memcache.get("last_prog_date")
+
+                if not (recent and last_date):
                     recent = LogoProgram.all().order('-date').fetch(5)
                     if recent:
                         last_date = recent[-1].date.strftime("%Y-%m-%dT%H:%M:%S")
                         recent = [program.hash for program in recent]
-                        memcache.set("recent_scripts", recent)
-                        memcache.set("last_script_date", last_date)
-                if recent and last_date:
-                    values['recent'] =  recent
-                    values['last_date'] =  last_date
+                        memcache.set_multi({"recent_progs": recent,
+                                            "last_prog_date": last_date}, time=3600)
+
+                values['recent'] = recent
+                values['last_date'] = last_date
 
             page = os.path.join(os.path.dirname(__file__), 'index.html.tmpl')
             self.response.out.write(template.render(page, values))
@@ -97,8 +99,13 @@ class Papert(webapp.RequestHandler):
         code = self.request.get('code',None)
         img = self.request.get('img',"")
 
+        # simple antispam
+        if sum(x in code.lower() for x in ('href=', 'url=', 'link=')) > 2:
+            self.redirect("/error")
+            return
+
         if code.strip():
-            hash = base64.b64encode(sha.sha(code.strip()).digest()[:6], "-_")
+            hash = base64.b64encode(hashlib.sha1(code.strip()).digest()[:6], "-_")
             if not LogoProgram.all().filter('hash =', hash).get():
                 program = LogoProgram()
                 program.code = code
@@ -108,6 +115,9 @@ class Papert(webapp.RequestHandler):
                     img = images.Image(img)
                     img.resize(125, 125)
                     program.img = img.execute_transforms()
+                else:
+                    self.redirect("/error")
+                    return
                 program.put()
                 memcache.set("program: %s" % hash, program)
                 memcache.delete("recent")
