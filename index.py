@@ -1,7 +1,7 @@
 import os
 import base64
 import hashlib
-import datetime 
+import datetime
 
 import webapp2
 from google.appengine.ext.webapp import template
@@ -49,18 +49,22 @@ class Papert(webapp2.RequestHandler):
                 self.redirect('/')
 
         if program and extra == ".png":
-            self.response.headers['Content-Type'] = 'image/png'
-            self.response.headers['Cache-Control'] = 'max-age:604800'
+            # enable edge caching
+            # https://code.google.com/p/googleappengine/issues/detail?id=2258#c14
+            self.response.headers['Cache-Control'] = 'public, max-age:604800'
+            self.response.headers['Pragma'] = 'Public'
             self.response.headers['Etag'] = program.hash
             self.response.headers['Last-Modified'] = program.date.ctime()
+
+            self.response.headers['Content-Type'] = 'image/png'
             self.response.out.write(program.img)
         else:
             values = {'code':""}
             if program:
                 values['code'] = program.code
                 values['hash'] = hash
-        
-       
+
+
             if older or newer:
                 if older:
                     browse_date = datetime.datetime.strptime(older,"%Y-%m-%dT%H:%M:%S")
@@ -121,9 +125,9 @@ class Papert(webapp2.RequestHandler):
                 memcache.delete("recent_progs")
         else:
             hash = ""
-    
+
         self.redirect("/%s" % hash)
-    
+
 app = webapp2.WSGIApplication([('/.*', Papert)])
 
 if __name__ == "__main__":
