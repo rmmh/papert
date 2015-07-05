@@ -1,7 +1,8 @@
-application: papertlogo
+application: papertlogo--hrd
 version: 1
-runtime: python
+runtime: python27
 api_version: 1
+threadsafe: true
 
 handlers:
 - url: /static
@@ -16,7 +17,7 @@ handlers:
   upload: static/error.txt
 
 - url: /moderate
-  script: moderate.py
+  script: moderate.app
 
 - url: /.*
-  script: index.py
+  script: index.app

@@ -1,6 +1,3 @@
-// $Id$
-
-
 function Logo () {
     this.turtle = null;
     this.textOutput = null;

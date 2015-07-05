@@ -1,12 +1,10 @@
-"""$Id$"""
 import os
 import base64
 import hashlib
 import datetime 
 
 from google.appengine.ext.webapp import template
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
+import webapp2
 from google.appengine.ext import db
 from google.appengine.api import images
 from google.appengine.api import memcache
@@ -17,7 +15,7 @@ class LogoProgram(db.Model):
     date = db.DateTimeProperty(auto_now_add=True)
     hash = db.StringProperty()
 
-class Papert(webapp.RequestHandler):
+class Papert(webapp2.RequestHandler):
     def get(self):
         hash = self.request.path[1:9] #this assumes that hashes are always 8 chars
         extra = self.request.path[9:]
@@ -126,10 +124,7 @@ class Papert(webapp.RequestHandler):
     
         self.redirect("/%s" % hash)
     
-application = webapp.WSGIApplication([('/.*', Papert)],debug=True)
-
-def main():
-    run_wsgi_app(application)
+app = webapp2.WSGIApplication([('/.*', Papert)])
 
 if __name__ == "__main__":
     main()

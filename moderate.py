@@ -1,12 +1,10 @@
-"""$Id: index.py 133 2009-03-26 15:31:38Z thomas.figg $"""
 import os
 import base64
 import hashlib
 import datetime 
 
+import webapp2
 from google.appengine.ext.webapp import template
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 from google.appengine.api import images
 from google.appengine.api import memcache
@@ -18,7 +16,7 @@ class LogoProgram(db.Model):
     date = db.DateTimeProperty(auto_now_add=True)
     hash = db.StringProperty()
 
-class Moderate(webapp.RequestHandler):
+class Moderate(webapp2.RequestHandler):
     def get(self):
         login_url = users.create_login_url("/moderate")
 
@@ -44,10 +42,7 @@ class Moderate(webapp.RequestHandler):
         page = os.path.join(os.path.dirname(__file__), 'moderate.html.tmpl')
         self.response.out.write(template.render(page, values))
     
-application = webapp.WSGIApplication([('/moderate', Moderate)],debug=True)
-
-def main():
-    run_wsgi_app(application)
+app = webapp2.WSGIApplication([('/moderate', Moderate)],debug=True)
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,3 @@
-// $Id$
-
 function Turtle (canvas, turtle) {
  
     if (canvas && canvas.getContext) {

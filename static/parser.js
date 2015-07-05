@@ -1,5 +1,3 @@
-// $Id$
-
 function Parser () {
     this.tk = null;
     this.grab = new Array();
@@ -307,4 +305,4 @@ Tokenizer.prototype.next = function () {
     } else {
         return new Token('error', 'I can\'t understand this:'+this.text);
     }
-}   
+}
