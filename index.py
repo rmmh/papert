@@ -3,8 +3,8 @@ import base64
 import hashlib
 import datetime 
 
-from google.appengine.ext.webapp import template
 import webapp2
+from google.appengine.ext.webapp import template
 from google.appengine.ext import db
 from google.appengine.api import images
 from google.appengine.api import memcache
@@ -118,7 +118,7 @@ class Papert(webapp2.RequestHandler):
                     return
                 program.put()
                 memcache.set("program: %s" % hash, program)
-                memcache.delete("recent")
+                memcache.delete("recent_progs")
         else:
             hash = ""
     
