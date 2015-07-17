@@ -17,6 +17,10 @@ class LogoProgram(db.Model):
 
 class Papert(webapp2.RequestHandler):
     def get(self):
+        # block a terrible bot
+        if 'ahref' in self.request.headers.get('User-Agent').lower():
+            return
+
         hash = self.request.path[1:9] #this assumes that hashes are always 8 chars
         extra = self.request.path[9:]
 
