@@ -19,5 +19,9 @@ handlers:
 - url: /moderate
   script: moderate.app
 
+- url: /robots.txt
+  static_files: static/robots.txt
+  upload: static/robots.txt
+
 - url: /.*
   script: index.app
