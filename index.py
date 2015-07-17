@@ -53,7 +53,7 @@ class Papert(webapp2.RequestHandler):
             # https://code.google.com/p/googleappengine/issues/detail?id=2258#c14
             self.response.headers['Cache-Control'] = 'public, max-age:604800'
             self.response.headers['Pragma'] = 'Public'
-            self.response.headers['Etag'] = program.hash
+            self.response.headers['Etag'] = str(program.hash)
             self.response.headers['Last-Modified'] = program.date.ctime()
 
             self.response.headers['Content-Type'] = 'image/png'
