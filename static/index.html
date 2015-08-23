@@ -5,26 +5,19 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>papert: logo in your browser</title>
 <link rel="icon" href="/favicon.ico" />
-<link rel="stylesheet" type="text/css" href="/static/papert.css" />
-<script type="text/javascript" src="/lib/canvas2svg.js"></script>
-<script type="text/javascript" src="/static/turtle.js"></script>
-<script type="text/javascript" src="/static/parser.js"></script>
-<script type="text/javascript" src="/static/logo.js"></script>
-<script type="text/javascript" src="/static/init.js"></script>
+<link rel="stylesheet" type="text/css" href="papert.css" />
+<script type="text/javascript" src="../lib/canvas2svg.js"></script>
+<script type="text/javascript" src="turtle.js"></script>
+<script type="text/javascript" src="parser.js"></script>
+<script type="text/javascript" src="logo.js"></script>
+<script type="text/javascript" src="init.js"></script>
 
 </head>
 <body onload="init('canvas','turtle','input','oldcode', 'textOutput'); clearcanvas(); run(1,false);">
     
 <div id="main">
 <form id="input" action="/" method="post" onSubmit="this.img.value = canvas.toDataURL().replace('data:image/png;base64,','')">
-<div id="top"><div class="inner"><h1>papert&#8213;logo in your browser</h1>
-<h2>
-examples:
-<a href="/_REo_2F2">koch snowflake</a>,
-<a href="/dZ1f62XY">hilbert curve</a>, 
-<a href="/8kpcBaQu">spiral</a>
-</h2>
-</div></div>
+<div id="top"><div class="inner"><h1>papert&#8213;logo in your browser</h1></div></div>
 
 <div id="content">
     <div class="inner">
@@ -47,13 +40,12 @@ examples:
     <div class="inner">
 		<div id="textOutput"></div>
         <div id="turtle">
-        <embed width="20" height="20" id='sprite' src="/static/turtle.svg"/>
+        <embed width="20" height="20" id='sprite' src="turtle.svg"/>
         </div>
         <canvas id="canvas" width="500" height="500">
     Your browser doesn't support canvas tags. Please upgrade to a recent version of Firefox or Opera.
     </canvas>
     <span style="float: left; margin-right: auto;">
-    <input type="submit" value="share this program" />
     <input type="button" onClick="document.location.href = canvas.toDataURL().replace('image/png', 'image/octet-stream')" value="save as png" />
     </span>
      <span style="float: right;margin-left: auto; margin-right: 20px;">
