@@ -6,6 +6,7 @@
 <title>papert: logo in your browser</title>
 <link rel="icon" href="/favicon.ico" />
 <link rel="stylesheet" type="text/css" href="/static/papert.css" />
+<script type="text/javascript" src="/lib/canvas2svg.js"></script>
 <script type="text/javascript" src="/static/turtle.js"></script>
 <script type="text/javascript" src="/static/parser.js"></script>
 <script type="text/javascript" src="/static/logo.js"></script>
@@ -41,6 +42,7 @@ bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygot
         <input type="button" onClick="run(25,true);" value="run slowly" />
         <input type="button" onClick="run(5,false);" value="run normally" style="font-weight: bold;"/>
         <input type="button" onClick="run(1,false);" value="run fast" />
+        <input type="button" onClick="run(1,false,{ svg: true });" value="run in SVG" />
         <input type="button" onClick="stop();" value="stop program" />
         <input type="hidden" name="img" />
         </div>
@@ -50,6 +52,7 @@ bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygot
 
 <div id="left">
     <div class="inner">
+        <div id="svg-container"></div>
 		<div id="textOutput"></div>
         <div id="turtle">
         <embed width="20" height="20" id='sprite' src="/static/turtle.svg"/>

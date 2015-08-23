@@ -6,6 +6,7 @@
 <title>papert: logo in your browser</title>
 <link rel="icon" href="/favicon.ico" />
 <link rel="stylesheet" type="text/css" href="papert.css" />
+<script type="text/javascript" src="../lib/canvas2svg.js"></script>
 <script type="text/javascript" src="turtle.js"></script>
 <script type="text/javascript" src="parser.js"></script>
 <script type="text/javascript" src="logo.js"></script>
@@ -28,6 +29,7 @@
         <input type="button" onClick="run(25,true);" value="run slowly" />
         <input type="button" onClick="run(5,false);" value="run normally" style="font-weight: bold;"/>
         <input type="button" onClick="run(1,false);" value="run fast" />
+        <input type="button" onClick="run(1,false,{ svg: true });" value="run in SVG" />
         <input type="button" onClick="stop();" value="stop program" />
         <input type="hidden" name="img" />
         </div>
@@ -37,6 +39,7 @@
 
 <div id="left">
     <div class="inner">
+        <div id="svg-container"></div>
 		<div id="textOutput"></div>
         <div id="turtle">
         <embed width="20" height="20" id='sprite' src="turtle.svg"/>
@@ -46,6 +49,7 @@
     </canvas>
     <span style="float: left; margin-right: auto;">
     <input type="button" onClick="document.location.href = canvas.toDataURL().replace('image/png', 'image/octet-stream')" value="save as png" />
+    <a href="#" style="display:none;" id="save-svg" type="button" onClick="saveSVG(this)">save as svg</a>
     </span>
      <span style="float: right;margin-left: auto; margin-right: 20px;">
      <input type="button" onClick="clearcanvas();" value="clear" />
