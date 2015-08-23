@@ -5,4 +5,5 @@ a logo interpreter in javascript, with turtle graphics, hosted on GAE http://log
 
 Try a static, client-side-only demo at: http://jywarren.github.io/papert/static/
 
+SVG export made possible by https://github.com/gliffy/canvas2svg
 
