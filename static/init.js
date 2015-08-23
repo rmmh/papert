@@ -80,7 +80,7 @@ function stop() {
 function saveSVG(element) {
 
     element.setAttribute('download',"papert.svg");
-    element.setAttribute('href',"data:image/svg+xml;utf8," + turtle.getSVGString());
+    element.setAttribute('href',"data:image/svg+xml;utf8," + turtle.turtle.getSVGString());
 
 }
 
