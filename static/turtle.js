@@ -1,13 +1,27 @@
-function Turtle (canvas, turtle) {
+function Turtle (canvas, turtle, _svg) {
+
+    this.svg = _svg || false;
  
     if (canvas && canvas.getContext) {
         this.wait = 100;
-    
-        this.c = canvas.getContext('2d');
+
+        if (this.svg) {
+          // swap in fake context from Canvas2Svg
+          this.c = new C2S(canvas.height, canvas.width);
+          this.svgContainer = document.getElementById('svg-container');
+        } else {
+          this.c = canvas.getContext('2d');
+        }
+
         this.canvas = canvas
 
-        this._top = canvas.offsetTop;
-        this._left = canvas.offsetLeft;
+        if (this.svg) {
+          this._top = this.svgContainer.offsetTop;
+          this._left = this.svgContainer.offsetLeft;
+        } else {
+          this._top = canvas.offsetTop;
+          this._left = canvas.offsetLeft;
+        }
         
 
         this.max_x = canvas.width;
@@ -21,6 +35,11 @@ function Turtle (canvas, turtle) {
         this.redobuffer = [];
         this.setup();
     }
+
+}
+
+Turtle.prototype.getSVGString = function() {
+    return this.c.getSerializedSvg();
 }
 
 Turtle.prototype.savestate = function() {
@@ -90,7 +109,7 @@ Turtle.prototype.update = function() {
     } else {
         this.turtle.style.left = "-10px";
         this.turtle.style.top = "-10px";
-    }   
+    }
 }
 
 
@@ -287,8 +306,8 @@ DelayCommand.prototype.call = function (that) {
 }
 
 
-function DelayTurtle (canvas, sprite, speed, draw_bits) {
-    this.turtle = new Turtle(canvas, sprite);
+function DelayTurtle (canvas, sprite, _svg, speed, draw_bits) {
+    this.turtle = new Turtle(canvas, sprite, _svg);
     this.pipeline = null;
     this.active = false;
     this.halt = false;

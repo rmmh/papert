@@ -5,38 +5,25 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>papert: logo in your browser</title>
 <link rel="icon" href="/favicon.ico" />
-<link rel="stylesheet" type="text/css" href="/static/papert.css" />
-<script type="text/javascript" src="/lib/canvas2svg.js"></script>
-<script type="text/javascript" src="/static/turtle.js"></script>
-<script type="text/javascript" src="/static/parser.js"></script>
-<script type="text/javascript" src="/static/logo.js"></script>
-<script type="text/javascript" src="/static/init.js"></script>
+<link rel="stylesheet" type="text/css" href="papert.css" />
+<script type="text/javascript" src="../lib/canvas2svg.js"></script>
+<script type="text/javascript" src="turtle.js"></script>
+<script type="text/javascript" src="parser.js"></script>
+<script type="text/javascript" src="logo.js"></script>
+<script type="text/javascript" src="init.js"></script>
 
 </head>
 <body onload="init('canvas','turtle','input','oldcode', 'textOutput'); clearcanvas(); run(1,false);">
     
 <div id="main">
 <form id="input" action="/" method="post" onSubmit="this.img.value = canvas.toDataURL().replace('data:image/png;base64,','')">
-<div id="top"><div class="inner"><h1>papert&#8213;logo in your browser</h1>
-<h2>
-examples:
-<a href="/_REo_2F2">koch snowflake</a>,
-<a href="/dZ1f62XY">hilbert curve</a>, 
-<a href="/8kpcBaQu">spiral</a>
-</h2>
-{% if hash %}
-<h4>share this program: <a href="http://logo.twentygototen.org/{{hash|escape}}">link to it</a><br />
-html: <input readonly="readonly" id="htmlsnippet" value="&lt;a href=&quot;http://logo.twentygototen.org/{{hash|escape}}&quot;&gt;&lt;img src=&quot;http://logo.twentygototen.org/{{hash}}.png&quot;/&gt;&lt;br/&gt;Run at logo.twentygototen.org&lt;/a&gt;" /><br />
-bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygototen.org/{{hash}}][img]http://logo.twentygototen.org/{{hash}}.png[/img]Run at logo.twentygototen.org[/url]" />
-</h4>
-{% endif %}
-</div></div>
+<div id="top"><div class="inner"><h1>papert&#8213;logo in your browser</h1></div></div>
 
 <div id="content">
     <div class="inner">
         <div id="oldcode">&nbsp;</div>
         <div>
-        <textarea name="code" id="code" rows="80" cols="20">{{code|escape}}</textarea>
+        <textarea name="code" id="code" rows="80" cols="20"></textarea>
         </div>
         <div style="margin: 5px;">
         <input type="button" onClick="run(25,true);" value="run slowly" />
@@ -55,14 +42,14 @@ bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygot
         <div id="svg-container"></div>
 		<div id="textOutput"></div>
         <div id="turtle">
-        <embed width="20" height="20" id='sprite' src="/static/turtle.svg"/>
+        <embed width="20" height="20" id='sprite' src="turtle.svg"/>
         </div>
         <canvas id="canvas" width="500" height="500">
     Your browser doesn't support canvas tags. Please upgrade to a recent version of Firefox or Opera.
     </canvas>
     <span style="float: left; margin-right: auto;">
-    <input type="submit" value="share this program" />
     <input type="button" onClick="document.location.href = canvas.toDataURL().replace('image/png', 'image/octet-stream')" value="save as png" />
+    <a href="#" style="display:none;" id="save-svg" type="button" onClick="saveSVG(this)">save as svg</a>
     </span>
      <span style="float: right;margin-left: auto; margin-right: 20px;">
      <input type="button" onClick="clearcanvas();" value="clear" />
@@ -73,31 +60,14 @@ bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygot
 </form>
 
 <div id="footer">
-<span style="float: left; margin-left: 20px; margin-right: auto; color: white;">
-Recent Programs
-</span>
 <span style="float: right;margin-left: auto; margin-right: 20px; color: white;">
 this is free software, and 
-<a href="http://code.google.com/p/papert">papert is hosted on google code</a>
+<a href="https://github.com/rmmh/papert">papert is hosted on Github</a>
 </span>
 &nbsp;
 </div>
-<div id="recent">
-<a name="recent"></a>
-<ul>
-{% if next_date %}
-<li><a href="?newer={{next_date|escape}}#recent">&lt;</li>
-{% endif %}
-{% for item in recent %}
-<li><a href="/{{item}}{% if older %}?older={{older|escape}}{% endif %}{% if newer %}?newer={{newer|escape}}{% endif %}"><img src="/{{item}}.png" height="125" width="125" alt="" /></a></li>
-{% endfor %}
-{% if last_date %}
-<li><a href="?older={{last_date|escape}}#recent">&gt;</a></li>
-{% endif %}
-</ul>
-</div>
 
-<iframe id="notes" src="static/help.txt"/>
+<iframe id="notes" src="help.txt"/>
 
 </div>
 </body>
