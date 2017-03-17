@@ -5,11 +5,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>papert: logo in your browser</title>
 <link rel="icon" href="/favicon.ico" />
-<link rel="stylesheet" type="text/css" href="/static/papert.css" />
-<script type="text/javascript" src="/static/turtle.js"></script>
-<script type="text/javascript" src="/static/parser.js"></script>
-<script type="text/javascript" src="/static/logo.js"></script>
-<script type="text/javascript" src="/static/init.js"></script>
+<link rel="stylesheet" type="text/css" href="{{"papert.css" | static}}"/>
+<script type="text/javascript" src="{{"turtle.js" | static}}"></script>
+<script type="text/javascript" src="{{"parser.js" | static}}"></script>
+<script type="text/javascript" src="{{"logo.js" | static}}"></script>
+<script type="text/javascript" src="{{"init.js" | static}}"></script>
 
 </head>
 <body onload="init('canvas','turtle','input','oldcode', 'textOutput'); clearcanvas(); run(1,false);">
@@ -52,7 +52,7 @@ bbcode: <input readonly="readonly" id="bbcode" value="[url=http://logo.twentygot
     <div class="inner">
 		<div id="textOutput"></div>
         <div id="turtle">
-        <embed width="20" height="20" src="/static/turtle.svg"/>
+        <embed width="20" height="20" src="{{"turtle.svg" | static}}"/>
         </div>
         <canvas id="canvas" width="500" height="500">
     Your browser doesn't support canvas tags. Please upgrade to a recent version of Firefox or Opera.

@@ -15,6 +15,15 @@ JINJA_ENV = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
+def static_filter(filename, hashes={}):
+    filename = 'static/%s' % filename
+    if filename not in hashes:
+        data = open(filename).read()
+        hashes[filename] = hashlib.sha1(data).hexdigest()[:10]
+    return '/%s?%s' % (filename, hashes[filename])
+
+JINJA_ENV.filters['static'] = static_filter
+
 class LogoProgram(db.Model):
     code = db.TextProperty()
     img  = db.BlobProperty()
