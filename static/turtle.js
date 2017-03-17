@@ -6,10 +6,6 @@ function Turtle (canvas, turtle) {
         this.c = canvas.getContext('2d');
         this.canvas = canvas
 
-        this._top = canvas.offsetTop;
-        this._left = canvas.offsetLeft;
-        
-
         this.max_x = canvas.width;
         this.max_y = canvas.height;
 
@@ -83,8 +79,8 @@ Turtle.prototype.showturtle = function() {
 
 Turtle.prototype.update = function() {
     if (this.visible && this.x >=0 && this.y >= 0 && this.x <= this.max_x && this.y <= this.max_y) {
-        this.turtle.style.left = parseInt(this._left + this.x -10) + "px";
-        this.turtle.style.top = parseInt(this._top + this.y-20) + "px";
+        this.turtle.style.left = parseInt(this.canvas.offsetLeft + this.x -10) + "px";
+        this.turtle.style.top = parseInt(this.canvas.offsetTop + this.y-20) + "px";
         this.turtle.style.transform = 'rotate('+(this.angle)+'deg)';
     } else {
         this.turtle.style.left = "-10px";
