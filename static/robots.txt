@@ -1,2 +1,9 @@
 user-agent: AhrefsBot
 disallow: /
+
+user-agent: MJ12bot
+disallow: /
+
+# No need to follow along the index!
+User-agent: *
+Disallow: /*?*
