@@ -15,7 +15,6 @@ function Turtle (canvas, turtle) {
 
         this.c.lineCap = "round";
         this.turtle = turtle;
-        this.sprite = document.getElementById('sprite');
         this.visible = true;
         this.undobuffer = [];
         this.redobuffer = [];
@@ -86,7 +85,7 @@ Turtle.prototype.update = function() {
     if (this.visible && this.x >=0 && this.y >= 0 && this.x <= this.max_x && this.y <= this.max_y) {
         this.turtle.style.left = parseInt(this._left + this.x -10) + "px";
         this.turtle.style.top = parseInt(this._top + this.y-20) + "px";
-        this.sprite.setAttribute('transform','rotate('+(this.angle)+' 10 10)');
+        this.turtle.style.transform = 'rotate('+(this.angle)+'deg)';
     } else {
         this.turtle.style.left = "-10px";
         this.turtle.style.top = "-10px";
