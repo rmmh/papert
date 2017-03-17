@@ -3,11 +3,17 @@ import base64
 import hashlib
 import datetime
 
+import jinja2
 import webapp2
-from google.appengine.ext.webapp import template
+
 from google.appengine.ext import db
 from google.appengine.api import images
 from google.appengine.api import memcache
+
+JINJA_ENV = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 class LogoProgram(db.Model):
     code = db.TextProperty()
@@ -98,8 +104,8 @@ class Papert(webapp2.RequestHandler):
                 values['recent'] = recent
                 values['last_date'] = last_date
 
-            page = os.path.join(os.path.dirname(__file__), 'index.html.tmpl')
-            self.response.out.write(template.render(page, values))
+            template = JINJA_ENV.get_template('index.html.tmpl')
+            self.response.out.write(template.render(values))
 
     def post(self):
         code = self.request.get('code',None)
