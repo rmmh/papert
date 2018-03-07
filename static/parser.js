@@ -253,10 +253,10 @@ Tokenizer.prototype.load = function (text) {
 }
 
  
-Tokenizer.prototype.ops_rx = /^\s*(!=|<>|<=|>=|\+|\-|\*|\/|\%|<|>|=|\[|\]|\(|\)|to|end)\s*/i;
+Tokenizer.prototype.ops_rx = /^\s*(!=|<>|<=|>=|\+|\-?!\d|\*|\/|\%|<|>|=|\[|\]|\(|\)|to|end)\s*/i;
 Tokenizer.prototype.wrd_rx = /^\s*([a-zA-Z\.]\w*\??)\s*/i;
 Tokenizer.prototype.var_rx = /^\s*:([a-zA-Z]\w*)\s*/i;
-Tokenizer.prototype.num_rx = /^\s*(\d+(?:\.\d+)?)\s*/i;
+Tokenizer.prototype.num_rx = /^\s*(-?\d+(?:\.\d+)?)\s*/i;
 Tokenizer.prototype.sym_rx = /^\s*"([a-zA-Z]\w*)\s*/i;
 
 Tokenizer.prototype.empty = /^\s*$/;
